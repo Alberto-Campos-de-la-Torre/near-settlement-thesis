@@ -1,0 +1,225 @@
+"""L3: econometrics of the regime shift.
+
+Outputs (data/derived/models/):
+- breaks.json          structural breaks (PELT, l2 cost on standardized log series) per metric
+- stationarity.json    ADF on log levels and weekly log differences
+- var_granger.json     VAR on weekly d-log series, lag by AIC, pairwise Granger tests both directions
+- johansen.json        Johansen trace test price vs each usage metric (log levels, weekly)
+- rolling_corr.csv     rolling 90-day correlation of log price vs log usage metrics (daily levels)
+- yearly_corr.csv      Pearson correlation per calendar year, price vs each metric (log levels)
+Every test reports the sample window and the number of observations, so a reader can judge power.
+"""
+from __future__ import annotations
+
+import json
+from .serialization import dumps as json_dumps
+import math
+import warnings
+
+import numpy as np
+import pandas as pd
+import ruptures as rpt
+from statsmodels.tsa.api import VAR
+from statsmodels.tsa.stattools import adfuller
+from statsmodels.tsa.vector_ar.vecm import coint_johansen
+from statsmodels.stats.multitest import multipletests
+
+from .config import DERIVED, MODELS
+
+USAGE = ["active_accounts", "txns", "tx_fee_usd", "tx_volume_usd", "intents_volume_usd", "near_app_fees_usd"]
+PRICE = "near_price"
+
+
+def _load_daily() -> pd.DataFrame:
+    d = pd.read_csv(DERIVED / "daily.csv", parse_dates=["date"]).set_index("date")
+    # QAA (L1) is merged if present so the same tests run on the quality-adjusted series
+    from .qaa import available_series
+    q = available_series(d.index)
+    if q is not None:
+        d["qaa"] = q
+    return d
+
+
+def _logs(s: pd.Series) -> pd.Series:
+    s = s.astype(float).where(s > 0)
+    return np.log(s)
+
+
+# ---------- structural breaks ----------
+
+def detect_breaks(s: pd.Series, *, min_size: int = 90, smooth: int = 7, pen_mult: float = 3.0) -> dict:
+    x = _logs(s.rolling(smooth, min_periods=1).mean()).dropna()
+    if len(x) < 3 * min_size:
+        return {"n": int(len(x)), "breaks": [], "note": "series too short"}
+    if x.nunique() < 2 or not np.isfinite(x.std()) or x.std() == 0:
+        return {"n": int(len(x)), "breaks": [], "note": "constant or nonfinite series; breaks not identified"}
+    z = ((x - x.mean()) / x.std()).to_numpy().reshape(-1, 1)
+    n = len(z)
+    pen = pen_mult * math.log(n)  # on a standardized signal, sigma^2 = 1
+    idx = rpt.Pelt(model="l2", min_size=min_size, jump=1).fit(z).predict(pen=pen)
+    cuts = [i for i in idx if i < n]
+    segs, prev = [], 0
+    for c in cuts + [n]:
+        seg = x.iloc[prev:c]
+        segs.append({"start": str(seg.index[0].date()), "end": str(seg.index[-1].date()),
+                     "mean_level": float(np.exp(seg.mean())), "days": int(len(seg))})
+        prev = c
+    return {"n": n, "start": str(x.index[0].date()), "end": str(x.index[-1].date()), "penalty": pen,
+            "breaks": [str(x.index[i].date()) for i in cuts], "segments": segs}
+
+
+# ---------- stationarity ----------
+
+def adf(s: pd.Series) -> dict:
+    s = s.dropna()
+    if len(s) < 30:
+        return {"n": int(len(s)), "note": "too short"}
+    if s.nunique() < 2:
+        return {"n": int(len(s)), "stationary_5pct": False, "note": "constant series; test not identified"}
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        stat, p, lags, nobs, crit, _ = adfuller(s, autolag="AIC")
+    return {"n": int(nobs), "adf_stat": float(stat), "p_value": float(p), "lags": int(lags),
+            "stationary_5pct": bool(p < 0.05)}
+
+
+# ---------- VAR / Granger ----------
+
+def weekly_dlogs(d: pd.DataFrame, cols: list[str], start: str | None = None) -> pd.DataFrame:
+    w = d[cols].resample("W-SUN").mean()
+    w = w.loc[w.index <= d.index.max()]
+    if start:
+        w = w.loc[w.index >= pd.Timestamp(start)]
+    return _logs_df(w).diff().dropna()
+
+
+def _logs_df(df: pd.DataFrame) -> pd.DataFrame:
+    return df.apply(_logs)
+
+
+def var_granger(d: pd.DataFrame, metric: str, start: str | None) -> dict:
+    cols = [PRICE, metric]
+    w = weekly_dlogs(d, cols, start)
+    w = w.replace([np.inf, -np.inf], np.nan).dropna()
+    if len(w) < 40:
+        return {"metric": metric, "n_weeks": int(len(w)), "note": "fewer than 40 weekly observations"}
+    diagnostics = {c: adf(w[c]) for c in cols}
+    base = {"metric": metric, "start": str(w.index[0].date()), "end": str(w.index[-1].date()), "n_weeks": len(w),
+            "stationarity": diagnostics, "inference_valid": False}
+    if not all(r.get("stationary_5pct", False) for r in diagnostics.values()):
+        return {**base, "note": "inconclusive: ADF does not establish stationary log differences for both series"}
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        model = VAR(w)
+        res = model.fit(maxlags=min(8, len(w) // 10), ic="aic")
+        lag = int(res.k_ar) if res.k_ar > 0 else 1
+        if res.k_ar == 0:
+            return {**base, "lag_aic": 0, "note": "AIC selects zero lags; no lagged Granger test"}
+        g_usage_to_price = res.test_causality(PRICE, [metric], kind="f")
+        g_price_to_usage = res.test_causality(metric, [PRICE], kind="f")
+        stable = bool(res.is_stable())
+        white_p = float(res.test_whiteness(nlags=max(12, lag + 2), adjusted=True).pvalue)
+    # cumulative response of price to a one-sd shock in usage (orthogonalized, usage ordered first)
+    order = [metric, PRICE]
+    res2 = VAR(w[order]).fit(lag)
+    cum = res2.irf(8).orth_cum_effects  # shape (periods+1, k, k) response i to shock j
+    k = order.index(PRICE)
+    j = order.index(metric)
+    return {
+        **base, "stable": stable, "residual_whiteness_p": white_p,
+        "inference_valid": bool(stable and white_p >= 0.05),
+        "note": "predictive association, not economic causality" if stable and white_p >= 0.05 else "inconclusive: stability or residual-whiteness check failed",
+        "metric": metric, "start": str(w.index[0].date()), "end": str(w.index[-1].date()), "n_weeks": int(len(w)),
+        "lag_aic": lag,
+        "usage_granger_causes_price": {"F": float(g_usage_to_price.test_statistic), "p_value": float(g_usage_to_price.pvalue)},
+        "price_granger_causes_usage": {"F": float(g_price_to_usage.test_statistic), "p_value": float(g_price_to_usage.pvalue)},
+        "cum_price_response_to_usage_shock_8w": float(cum[8, k, j]),
+        "contemporaneous_corr_dlog": float(w[PRICE].corr(w[metric])),
+    }
+
+
+def johansen(d: pd.DataFrame, metric: str, start: str | None) -> dict:
+    cols = [PRICE, metric]
+    w = d[cols].resample("W-SUN").mean()
+    w = w.loc[w.index <= d.index.max()]
+    if start:
+        w = w.loc[w.index >= pd.Timestamp(start)]
+    lw = _logs_df(w).replace([np.inf, -np.inf], np.nan).dropna()
+    if len(lw) < 40:
+        return {"metric": metric, "n_weeks": int(len(lw)), "note": "fewer than 40 weekly observations"}
+    integration = {c: {"level": adf(lw[c]), "difference": adf(lw[c].diff())} for c in cols}
+    integration_ok = all(not r["level"].get("stationary_5pct", True) and r["difference"].get("stationary_5pct", False) for r in integration.values())
+    if not integration_ok or any(lw[c].nunique() < 2 for c in cols):
+        return {"metric": metric, "n_weeks": int(len(lw)), "integration_checks": integration,
+                "inference_valid": False, "cointegrated_5pct": None, "note": "inconclusive: I(1) prerequisites not established or constant series"}
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            jr = coint_johansen(lw, det_order=0, k_ar_diff=2)
+    except np.linalg.LinAlgError:
+        return {"metric": metric, "n_weeks": int(len(lw)), "integration_checks": integration,
+                "inference_valid": False, "cointegrated_5pct": None, "note": "singular estimator; cointegration not identified"}
+    trace0, trace1 = float(jr.lr1[0]), float(jr.lr1[1])
+    cv0, cv1 = jr.cvt[0], jr.cvt[1]  # 90, 95, 99
+    rank = 0 if trace0 <= cv0[1] else 1 if trace1 <= cv1[1] else 2
+    valid = integration_ok and rank < 2
+    return {"metric": metric, "n_weeks": int(len(lw)), "start": str(lw.index[0].date()), "end": str(lw.index[-1].date()),
+            "trace_r0": trace0, "cv95_r0": float(cv0[1]), "trace_r1": trace1, "cv95_r1": float(cv1[1]),
+            "rank_5pct": rank, "integration_checks": integration, "inference_valid": valid,
+            "cointegrated_5pct": bool(rank == 1) if valid else None,
+            "note": "rank 1 detected" if valid and rank == 1 else "rank 0: no rejection" if valid else "inconclusive: I(1) prerequisites not established or full rank"}
+
+
+# ---------- correlations ----------
+
+def rolling_corr(d: pd.DataFrame, window: int = 90) -> pd.DataFrame:
+    lp = _logs(d[PRICE])
+    out = pd.DataFrame(index=d.index)
+    for m in [c for c in USAGE + ["qaa"] if c in d.columns]:
+        out[m] = lp.rolling(window, min_periods=window).corr(_logs(d[m]))
+    out.index.name = "date"
+    return out.dropna(how="all")
+
+
+def yearly_corr(d: pd.DataFrame) -> pd.DataFrame:
+    lp = _logs(d[PRICE])
+    rows = []
+    for y, grp in d.groupby(d.index.year):
+        row = {"year": int(y), "days": int(len(grp))}
+        for m in [c for c in USAGE + ["qaa"] if c in d.columns]:
+            x = _logs(grp[m]); yv = lp.loc[grp.index]
+            ok = x.notna() & yv.notna()
+            row[m] = float(x[ok].corr(yv[ok])) if ok.sum() > 30 else None
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def run() -> dict:
+    d = _load_daily()
+    metrics = [c for c in USAGE + ["qaa"] if c in d.columns]
+    starts = {m: ("2024-12-01" if m == "intents_volume_usd" else "2023-01-01" if m == "near_app_fees_usd" else None) for m in metrics}
+
+    breaks = {m: detect_breaks(d[m]) for m in metrics + [PRICE]}
+    (MODELS / "breaks.json").write_text(json_dumps(breaks, indent=1))
+
+    stat = {}
+    for m in metrics + [PRICE]:
+        wk = d[[m]].resample("W-SUN").mean()[m]
+        stat[m] = {"log_level_weekly": adf(_logs(wk)), "dlog_weekly": adf(_logs(wk).diff())}
+    (MODELS / "stationarity.json").write_text(json_dumps(stat, indent=1))
+
+    vg = [var_granger(d, m, starts[m]) for m in metrics]
+    cells = [(r, field) for r in vg if r.get("inference_valid") for field in ["usage_granger_causes_price", "price_granger_causes_usage"]]
+    if cells:
+        adjusted = multipletests([r[f]["p_value"] for r, f in cells], method="holm")[1]
+        for (r, f), p in zip(cells, adjusted):
+            r[f]["p_value_holm"] = float(p)
+    (MODELS / "var_granger.json").write_text(json_dumps(vg, indent=1))
+
+    jo = [johansen(d, m, starts[m]) for m in metrics]
+    (MODELS / "johansen.json").write_text(json_dumps(jo, indent=1))
+
+    rolling_corr(d).to_csv(MODELS / "rolling_corr.csv")
+    yearly_corr(d).to_csv(MODELS / "yearly_corr.csv", index=False)
+    print(f"L3: breaks for {len(breaks)} series, VAR/Granger for {len(vg)} metrics, Johansen for {len(jo)}")
+    return {"breaks": breaks, "var_granger": vg, "johansen": jo}

@@ -1,0 +1,12 @@
+{
+ "as_of": "2026-11-01",
+ "month": "2026-10",
+ "active_accounts_daily_mean": 72046,
+ "qaa": 44634,
+ "intents_volume_usd": 3985641601,
+ "usd_per_txn": 345.98,
+ "ic_intents_12w_vs_btc": -0.576,
+ "thesis_sha256": "216a5a1cd8eb2cbe62ce7d98c143c2a77288b7d1e26658744e9a6ea2c2212f2e",
+ "raw_manifest_sha256": "a3a45f5eb31d2c46614f5b0af28d9b54eed795373b42c980ddfffb35cb390027",
+ "repo": "https://github.com/Alberto-Campos-de-la-Torre/near-settlement-thesis"
+}

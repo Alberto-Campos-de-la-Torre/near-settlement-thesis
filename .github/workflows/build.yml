@@ -1,0 +1,28 @@
+name: build
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: astral-sh/setup-uv@e58605a9b6da7c637471fab8847a5e5a6b8df081 # v5
+        with:
+          python-version: "3.12"
+      - name: Public release policy
+        run: python tools/check_publication.py
+      - name: Install
+        run: uv sync --locked --all-extras
+      - name: Rebuild everything from the committed raw snapshots (no network, no credentials)
+        run: make build
+      - name: Tests
+        run: make test
+      - name: All analytical artifacts must match committed inputs
+        run: make check-generated

@@ -1,0 +1,14 @@
+{
+ "sql": "l1_full_month_summary_from_result_table.sql (months 2024-11..2026-01, aggregated over the anonymous result table of the per-account query)",
+ "run_at": "2026-11-08T08:18:36+00:00",
+ "source_job_id": "redacted-private-execution-id",
+ "source_bytes_processed": 148239286272,
+ "aggregate_job_id": "redacted-private-execution-id",
+ "rows": 105,
+ "note": "the 46M-row per-account result was not downloaded (4 GB); it was aggregated server-side twice, first with coarse name classes (75 rows) and then with the finer classes committed here (105 rows); the second aggregation is the provenance of this file",
+ "name_class_rule": "tg, sweat, kaiching (ENDS_WITH .kaiching), implicit (64 hex), eth_implicit (0x + 40 hex), named (.near), other; re-aggregated 2026-11-08 from the same result table after the first aggregate showed millions of .users.kaiching sub-accounts under 'other'",
+ "aggregate_bytes_processed": 3204230102,
+ "aggregate_bytes_billed": 3204448256,
+ "superseded_aggregate_job_id": "redacted-private-execution-id",
+ "publication_note": "Private execution/project identifiers removed; measurement values and query definitions retained."
+}

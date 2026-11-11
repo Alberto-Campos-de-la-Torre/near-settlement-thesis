@@ -1,0 +1,11 @@
+{
+ "sql": "l1_full_month_summary_2.sql",
+ "run_at": "2026-11-08T08:18:55+00:00",
+ "bytes_processed": 20443430700,
+ "bytes_billed": 20444086272,
+ "accounted_bytes": 20444086272,
+ "maximum_bytes_billed": 200000000000,
+ "rows": 60,
+ "job_id": "redacted-private-execution-id",
+ "publication_note": "Private execution/project identifiers removed; measurement values and query definitions retained."
+}

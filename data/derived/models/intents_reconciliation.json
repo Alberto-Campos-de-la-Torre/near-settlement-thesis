@@ -1,0 +1,1555 @@
+{
+ "computed": true,
+ "economic_unit": {
+  "unit": "USD notional of settled swaps per UTC calendar day on intents.near",
+  "our_measure": "half gross participant notional: for each successful execute_intents receipt, for each (account, intent_hash) take the larger of priced inflow and priced outflow, sum over participants and divide by two. One two-party swap of 100 USDC against NEAR counts 100 USD once.",
+  "scope": "token_diff events emitted by intents.near in receipts with an explicit successful execution status; all chains and assets that appear in those events; no deposits, withdrawals or transfers",
+  "day_boundary": "UTC; a sampled window is attributed to the planned UTC day",
+  "prices": "DefiLlama coins daily USD prices (CoinGecko ids from the committed 1Click registry), stablecoins at par, at most seven-day forward fill; unknown or unpriced assets contribute zero",
+  "reference": "DefiLlama dexs/near-intents dailyVolume = SUM(volume_amount_usd) FROM dune.near.dataset_near_intents_metrics per date_at (adapter source: DefiLlama/dimension-adapters dexs/near-intents/index.ts). The dataset is a curated Dune table maintained for NEAR's metrics; whether volume_amount_usd is one-sided or two-sided notional is not published, so the two measures are compared, not assumed identical.",
+  "shared_origin": "DefiLlama does not compute this series itself; it queries Dune. Every public reference found derives from NEAR's own metrics datasets (Dune dune.near.*, the ClickHouse table behind near-intents.org, revenue.near.org volumeUsd), so none is of independent origin; the Dune series also covers confidential intents, which emit no public token_diff logs and are therefore outside what any on-chain log extraction can observe (see reference_definition)."
+ },
+ "reference_definition": {
+  "established": "2026-11-07",
+  "adapter": {
+   "source": "DefiLlama/dimension-adapters dexs/near-intents/index.ts",
+   "query": "SUM(CAST(volume_amount_usd AS DOUBLE)) FROM dune.near.dataset_near_intents_metrics WHERE date_at = day",
+   "notes": "no methodology comments in the adapter; flagged isExpensiveAdapter; start 2024-11-05"
+  },
+  "dataset_maintainer": {
+   "claim": "the dune.near.dataset_near_intents_* tables are uploaded by NEAR (the DefiLlama issue #10317 waits for 'near's datasets' to catch up when fee rows are missing)",
+   "kind": "observed in a public issue, not confirmed by NEAR documentation"
+  },
+  "confidential_intents": {
+   "claim": "the Dune all-time volume includes confidential intents, which the ClickHouse table behind near-intents.org excludes",
+   "source": "near/near-intents pull request #77 (hero stat hotfix)",
+   "cumulative_usd_billion": {
+    "public": 30.83,
+    "confidential": 2.52,
+    "dune_total": 33.35,
+    "clickhouse_public_only": 31.03
+   },
+   "share_of_dune_total": 0.07556221889055471,
+   "kind": "estimate: a cumulative share from a secondary source, applied here to the comparison period as if constant; the period share is unknown",
+   "implication": "confidential intents do not emit public token_diff logs, so they are structurally outside our on-chain measure while inside the reference"
+  },
+  "other_references": {
+   "revenue.near.org": "publishes volumeUsd per day equal to the Dune figure (same origin); no API or download",
+   "near-intents.org": "ClickHouse near_intents_metrics.intents_external_metrics, public intents only; no public API",
+   "Intents Explorer API": "1Click swaps only, JWT required, 1 request per 5 s: not a protocol-wide volume source",
+   "Flipside ez_intents": "independent indexer of intents.near logs (one row per token_diff leg, USD per leg); requires an account; not accessed"
+  },
+  "one_or_two_sided": "not published anywhere found; the comparison keeps both readings"
+ },
+ "pooled_ratio_all_days": {
+  "days": 46,
+  "ratio": 0.25253575034639153,
+  "ci_lo": 0.17779112325476906,
+  "ci_hi": 0.32746183577166066
+ },
+ "components": {
+  "temporal_coverage": {
+   "days_sampled": 49,
+   "days_with_reference": 46,
+   "block_coverage_share_mean": 0.000865397779368599,
+   "windows_per_day": 2,
+   "blocks_per_window": 50,
+   "between_window_ratio_15_over_03": {
+    "median": 4.797040485877782,
+    "days_both_positive": 30
+   },
+   "share_of_days_one_window_carries_over_80pct": 0.5869565217391305,
+   "reading": "two 50-block windows observe about 0.07% of a day's blocks; the 15:00 UTC window carries several times the 03:00 volume, so the day mean is sensitive to which hours are observed. The intraday block measures this directly where available"
+  },
+  "valuation": {
+   "legs_total": 3844,
+   "legs_unpriced": 222,
+   "legs_unpriced_share": 0.057752341311134235,
+   "account_intents": 1870,
+   "account_intents_without_any_priced_side": 20,
+   "batches_with_unvalued_account_intent": 16,
+   "unpriced_assets_top": [
+    {
+     "asset_id": "nep245:v2_1.omni.hot.tg:137_11111111111111111111",
+     "legs": 52,
+     "symbol": "pol",
+     "reason": "price snapshot polygon-ecosystem-token is empty (DefiLlama coins API returned no history)"
+    },
+    {
+     "asset_id": "nep141:token.sweat",
+     "legs": 24,
+     "symbol": "sweat",
+     "reason": "price snapshot sweatcoin is empty (DefiLlama coins API returned no history)"
+    },
+    {
+     "asset_id": "nep245:v2_1.omni.hot.tg:1100_111bzQBB5v7AhLyPMDwS8uJgQV24KaAPXtwyVWu2KXbbfQU6NXRCz",
+     "legs": 10,
+     "symbol": "xlm",
+     "reason": "no price snapshot for stellar"
+    },
+    {
+     "asset_id": "nep141:bera.omft.near",
+     "legs": 8,
+     "symbol": "bera",
+     "reason": "price snapshot berachain-bera is empty (DefiLlama coins API returned no history)"
+    },
+    {
+     "asset_id": "nep141:gnosis-0x9c58bacc331c9aa871afd802db6379a98e80cedb.omft.near",
+     "legs": 6,
+     "symbol": "gno",
+     "reason": "no price snapshot for gnosis"
+    },
+    {
+     "asset_id": "nep141:aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near",
+     "legs": 6,
+     "symbol": "aurora",
+     "reason": "no price snapshot for aurora-near"
+    },
+    {
+     "asset_id": "nep141:eth-0xaaaaaa20d9e0e2461697782ef11675f668207961.omft.near",
+     "legs": 6,
+     "symbol": "aurora",
+     "reason": "no price snapshot for aurora-near"
+    },
+    {
+     "asset_id": "nep245:v2_1.omni.hot.tg:42161_11111111111111111111",
+     "legs": 6,
+     "symbol": null,
+     "reason": "asset id not in the committed 1Click registry"
+    },
+    {
+     "asset_id": "nep141:npro.nearmobile.near",
+     "legs": 6,
+     "symbol": "npro",
+     "reason": "no price snapshot for npro"
+    },
+    {
+     "asset_id": "nep141:sol-c58e6539c2f2e097c251f8edf11f9c03e581f8d4.omft.near",
+     "legs": 4,
+     "symbol": "trump",
+     "reason": "no price snapshot for official-trump"
+    },
+    {
+     "asset_id": "nep141:arb-0x912ce59144191c1204e64559fe8253a0e49e6548.omft.near",
+     "legs": 4,
+     "symbol": "arb",
+     "reason": "price snapshot arbitrum is empty (DefiLlama coins API returned no history)"
+    },
+    {
+     "asset_id": "nep245:v2_1.omni.hot.tg:8453_11111111111111111111",
+     "legs": 4,
+     "symbol": null,
+     "reason": "asset id not in the committed 1Click registry"
+    }
+   ],
+   "two_sided_pricing_check": {
+    "account_intents_two_sided": 1577,
+    "in_over_out": {
+     "p5": 0.9701132488112266,
+     "p25": 0.9973193162774768,
+     "p50": 1.0,
+     "p75": 1.0015917518805229,
+     "p95": 1.0257700912598398
+    },
+    "within_3pct_share": 0.9150285351934052,
+    "reading": "near 1.0 means daily prices and decimals are consistent across the two legs of the same intent"
+   },
+   "reading": "an account-intent is valued by whichever side is priced, so unpriced legs lose value only when neither side is priced; the count above bounds that loss in account-intents, not in USD, which is unobservable without a price"
+  },
+  "route_reconstruction": {
+   "batches": 579,
+   "accounts_per_batch": {
+    "1": 1,
+    "2": 276,
+    "3": 220,
+    "4": 66,
+    "5": 12,
+    "6": 4
+   },
+   "intents_per_batch": {
+    "1": 3,
+    "2": 182,
+    "3": 215,
+    "4": 91,
+    "5": 45,
+    "6": 36,
+    "7": 6,
+    "8": 1
+   },
+   "batches_with_more_than_two_accounts_share": 0.5215889464594128,
+   "per_token_net_relative_to_gross": {
+    "p50": 5.016610903379927e-07,
+    "p99": 0.0008031484397896317,
+    "reading": "diffs within a receipt balance per token up to rounding dust; fees are not inside token_diff"
+   },
+   "alternative_definitions_total_usd": {
+    "half_gross_participant_notional": 407393.6323019824,
+    "full_gross_participant_notional": 814787.2646039648,
+    "user_side_notional_heuristic_roles": 395204.3117352623
+   },
+   "reading": "if the reference counted both sides of every swap, our ratio would double; if it counted only user legs, it would move by the user-side/half-gross factor. These bounds are definitional, not evidence about the reference"
+  },
+  "residual": {
+   "pooled_ratio": 0.25253575034639153,
+   "if_reference_were_two_sided_notional": 0.5050715006927831,
+   "confidential_intents_share_of_reference": 0.07556221889055471,
+   "after_confidential_intents_exclusion": 0.273177660527154,
+   "intraday_bias_factor_used": 2.8197878661858384,
+   "after_intraday_bias_correction": 0.712097244604891,
+   "after_intraday_bias_correction_mean_factor": 1.0558980687100654,
+   "after_confidential_and_intraday": 0.7703030524675029,
+   "after_both": 1.424194489209782,
+   "unexplained_factor_to_parity": 1.4043025830760694,
+   "unexplained_factor_after_confidential_and_intraday": 1.298190363905104,
+   "two_sided_and_intraday_overshoot": true,
+   "reading": "Complete days from BigQuery identify the definitional component on the days they cover: twice our half-gross volume equals the reference on the median day (1.00; within 5% of parity on 39 of 46 days), strong empirical support for a two-sided reference on those days, not its published definition. The sampled estimator's remaining gap to the complete days (pooled 0.55) is the expansion error of the two-window design, measured rather than inferred from the intraday factor. On the four days from September 2026 twice our volume is 0.63 to 0.85 of the reference; candidate explanations (confidential intents, unpriced legs, a change in what the reference counts) are listed with the complete days and none is demonstrated here. The declared estimator and its failed tolerance check stay as declared.",
+   "two_sided_reading_on_complete_days": {
+    "median_day": 1.0020162409771292,
+    "days_within_5pct_of_parity": 39,
+    "days": 46,
+    "confirmed": true
+   },
+   "sampled_expansion_over_complete_day_pooled": 0.5510939929216894
+  }
+ },
+ "holdout": {
+  "rule": "sampled days with a positive reference value are sorted chronologically; even positions calibrate, odd positions validate; declared before evaluation",
+  "tolerance": {
+   "point_ratio_min": 0.8,
+   "point_ratio_max": 1.25,
+   "interval_must_include": 1.0,
+   "declared": "2026-11-06, before evaluating the holdout days",
+   "justification": "covers measured pricing dispersion (a few percent), not coverage or definitional gaps"
+  },
+  "calibration": {
+   "days": 23,
+   "ratio": 0.21048775227637342,
+   "ci_lo": 0.114064000233017,
+   "ci_hi": 0.30469053002190527,
+   "within_tolerance": false
+  },
+  "validation": {
+   "days": 23,
+   "ratio": 0.2973787079358753,
+   "ci_lo": 0.18626500322176417,
+   "ci_hi": 0.41562754073194585,
+   "within_tolerance": false
+  },
+  "verdict": "validation days outside the declared tolerance: the on-chain estimate does not reproduce the reference level"
+ },
+ "intraday": {
+  "selection_rule": "sampled days with both fixed windows usable and a DefiLlama reference; pick the highest-volume day, the day closest to the 2026 median and the day closest to the 2025 median; declared before fetching",
+  "fetched_at": "2026-11-07T04:55:45+00:00",
+  "blocks_per_window": 50,
+  "complete": true,
+  "days": [
+   {
+    "day": "2025-08-31",
+    "hours_usable": 24,
+    "blocks_observed": 1199,
+    "usd_per_hour_window": {
+     "00": 151.98169253931314,
+     "01": 0.0,
+     "02": 2.2503760179228003,
+     "03": 0.0,
+     "04": 0.0,
+     "05": 205.0831163408484,
+     "06": 0.0,
+     "07": 0.3514498286227753,
+     "08": 75.69256119111502,
+     "09": 51.12089668679337,
+     "10": 8.927236359255819,
+     "11": 0.6251961080259318,
+     "12": 155.61228824689402,
+     "13": 62.98106957900712,
+     "14": 260.22263907664825,
+     "15": 572.8859596177955,
+     "16": 0.11033850483072,
+     "17": 34.97069269337113,
+     "18": 50000.11350993074,
+     "19": 366.4738219153653,
+     "20": 346.37132155782524,
+     "21": 67.15434457183443,
+     "22": 34.995858280369276,
+     "23": 690.9269924313135
+    },
+    "hour_share_of_sampled": {
+     "00": 0.002862779823667337,
+     "01": 0.0,
+     "02": 4.238886244873078e-05,
+     "03": 0.0,
+     "04": 0.0,
+     "05": 0.0038630166425047186,
+     "06": 0.0,
+     "07": 6.620030752403749e-06,
+     "08": 0.0014257713107358493,
+     "09": 0.0009629309238339916,
+     "10": 0.0001681565174290729,
+     "11": 1.1776410526741665e-05,
+     "12": 0.0029311669824487623,
+     "13": 0.001186333250086235,
+     "14": 0.004901643799087163,
+     "15": 0.010791078445398247,
+     "16": 2.0783743102564723e-06,
+     "17": 0.0006587200852257733,
+     "18": 0.9418194635533519,
+     "19": 0.006903027896009151,
+     "20": 0.006524370233580863,
+     "21": 0.0012649425039277208,
+     "22": 0.0006591941129425683,
+     "23": 0.01301454024173258
+    },
+    "fixed_hours_share_of_sampled": 0.010791078445398247,
+    "largest_hour": "18",
+    "largest_hour_share_of_sampled": 0.9418194635533519,
+    "expanded_from_all_hours_usd": 6328987.415058588,
+    "expanded_from_fixed_hours_usd": 819559.1961100259,
+    "fixed_window_bias_factor": 7.72242864834979,
+    "reference_usd": 4216251.0,
+    "ratio_all_hours_to_reference": 1.5010936054467792,
+    "ratio_fixed_hours_to_reference": 0.19438102620314252
+   },
+   {
+    "day": "2026-04-13",
+    "hours_usable": 24,
+    "blocks_observed": 1199,
+    "usd_per_hour_window": {
+     "00": 9093.267236126918,
+     "01": 4946.5902865599455,
+     "02": 639.3226336660383,
+     "03": 612.5749553204075,
+     "04": 692.6792418120065,
+     "05": 0.19534558668991253,
+     "06": 1229.896329054706,
+     "07": 22773.51201691966,
+     "08": 27973.339954434796,
+     "09": 31328.603665450468,
+     "10": 532.7689495259615,
+     "11": 335.31835963671443,
+     "12": 4672.281762842336,
+     "13": 523.6033877053561,
+     "14": 43722.114091191404,
+     "15": 9945.677929106561,
+     "16": 4026.164257546165,
+     "17": 737.924793065299,
+     "18": 605.2928324895232,
+     "19": 40937.27274939515,
+     "20": 46039.829070212545,
+     "21": 738.6803804385135,
+     "22": 1230.3168369896985,
+     "23": 204.3899603067685
+    },
+    "hour_share_of_sampled": {
+     "00": 0.03586498872576226,
+     "01": 0.01950997372579158,
+     "02": 0.0025215688105437607,
+     "03": 0.0024160726057808443,
+     "04": 0.0027320139783704937,
+     "05": 7.704675428900308e-07,
+     "06": 0.004850865682266172,
+     "07": 0.08982159333092705,
+     "08": 0.11033036817633853,
+     "09": 0.12356394990694551,
+     "10": 0.0021013076897455564,
+     "11": 0.0013225377497026202,
+     "12": 0.01842806643603036,
+     "13": 0.0020651575620933855,
+     "14": 0.17244551251250445,
+     "15": 0.03922700362091182,
+     "16": 0.01587969779786914,
+     "17": 0.0029104681184999336,
+     "18": 0.002387350998194997,
+     "19": 0.16146174829080098,
+     "20": 0.18158687165587972,
+     "21": 0.0029134482500541895,
+     "22": 0.00485252421840681,
+     "23": 0.0008061396890369511
+    },
+    "fixed_hours_share_of_sampled": 0.041643076226692666,
+    "largest_hour": "20",
+    "largest_hour_share_of_sampled": 0.18158687165587972,
+    "expanded_from_all_hours_usd": 29927000.46248133,
+    "expanded_from_fixed_hours_usd": 14953547.977685072,
+    "fixed_window_bias_factor": 2.0013310892599465,
+    "reference_usd": 80113582.0,
+    "ratio_all_hours_to_reference": 0.37355713869442675,
+    "ratio_fixed_hours_to_reference": 0.18665434255186683
+   },
+   {
+    "day": "2026-09-25",
+    "hours_usable": 24,
+    "blocks_observed": 1200,
+    "usd_per_hour_window": {
+     "00": 108.9867368114435,
+     "01": 631758.1862926881,
+     "02": 10080.260059305105,
+     "03": 16618.192433954395,
+     "04": 58318.89966933816,
+     "05": 248545.73646872828,
+     "06": 108291.28819079718,
+     "07": 243.64662848865416,
+     "08": 3108.419470458692,
+     "09": 5970.68690743673,
+     "10": 33479.07803294708,
+     "11": 40212.2254212315,
+     "12": 1341.861494563171,
+     "13": 909.5171168951408,
+     "14": 2483.0770841047797,
+     "15": 21888.80901343934,
+     "16": 10551.046358271187,
+     "17": 10280.123863435354,
+     "18": 6706.811053657293,
+     "19": 2493.4248059407764,
+     "20": 665.4105955838477,
+     "21": 83097.03586913885,
+     "22": 5813.248278651805,
+     "23": 12.933488869524126
+    },
+    "hour_share_of_sampled": {
+     "00": 8.364428339186713e-05,
+     "01": 0.48485680290456346,
+     "02": 0.00773631869098869,
+     "03": 0.01275399959731901,
+     "04": 0.044758130335468466,
+     "05": 0.19075192656697437,
+     "06": 0.08311054595544434,
+     "07": 0.0001869919977146991,
+     "08": 0.0023856253218927873,
+     "09": 0.004582335817557119,
+     "10": 0.025694259435724537,
+     "11": 0.0308617624250033,
+     "12": 0.001029841303699729,
+     "13": 0.0006980290418911157,
+     "14": 0.0019056924666534605,
+     "15": 0.01679905094688857,
+     "16": 0.008097634056140467,
+     "17": 0.00788970859109525,
+     "18": 0.005147290586361647,
+     "19": 0.0019136340548047577,
+     "20": 0.0005106840892507796,
+     "21": 0.0637746593816046,
+     "22": 0.004461506057274485,
+     "23": 9.926092292493024e-06
+    },
+    "fixed_hours_share_of_sampled": 0.029553050544207583,
+    "largest_hour": "01",
+    "largest_hour_share_of_sampled": 0.48485680290456346,
+    "expanded_from_all_hours_usd": 157316243.95134386,
+    "expanded_from_fixed_hours_usd": 55790098.90702747,
+    "fixed_window_bias_factor": 2.8197878661858384,
+    "reference_usd": 180522864.0,
+    "ratio_all_hours_to_reference": 0.8714477516340748,
+    "ratio_fixed_hours_to_reference": 0.3090472734081344
+   }
+  ],
+  "days_with_defined_factor": 3,
+  "days_with_unbounded_factor": [],
+  "fixed_window_bias_factor_mean": 4.181182534598524,
+  "fixed_window_bias_factor_median": 2.8197878661858384,
+  "fixed_window_bias_factor_median_unbounded_as_infinite": 2.8197878661858384,
+  "aggregate_used_for_correction": "median",
+  "ratio_all_hours_to_reference_median": 0.8714477516340748,
+  "reading": "Factor > 1 means the two fixed windows under-represent the day's hourly mean; even 24 hourly windows observe about 1,200 of ~150,000 blocks, so this measures the intraday expansion error, not a complete day. The median across days is used for the correction because a single hourly window can carry most of a day's sampled volume and dominate the mean",
+  "scope": "the days were selected by reference volume and are not a representative sample of the history; the factor is a sensitivity and is not applied to the declared estimator. It is checked on separately selected validation days (see intraday_validation)"
+ },
+ "intraday_validation": {
+  "rule": {
+   "declared": "2026-11-07, after the motivating days were measured and before any validation block was fetched",
+   "selection": "sampled days with both fixed windows usable and a DefiLlama reference, excluding the three motivating days, sorted chronologically; take the days at positions floor(n/4), floor(n/2) and floor(3n/4)",
+   "aggregation": "median of the per-day fixed-window bias factors over the validation days",
+   "acceptance": "the motivating median is considered supported if the validation median lies within x0.5 to x2 of it; the range reflects the day-level dispersion already observed on the motivating days (2.0 to 7.7)",
+   "not_a_correction_of_the_estimator": "the declared estimator stays uncorrected; the factor is published as a sensitivity in either outcome"
+  },
+  "status": "complete",
+  "days": [
+   {
+    "day": "2025-05-18",
+    "hours_usable": 24,
+    "blocks_observed": 1200,
+    "usd_per_hour_window": {
+     "00": 1242.0811848398764,
+     "01": 25.099987,
+     "02": 0.0,
+     "03": 0.0,
+     "04": 0.09650507351626454,
+     "05": 3.192297,
+     "06": 0.0,
+     "07": 5.831505999999999,
+     "08": 2.3400865,
+     "09": 0.0,
+     "10": 1.3384590957379898,
+     "11": 0.0,
+     "12": 0.0,
+     "13": 0.0,
+     "14": 0.0,
+     "15": 0.0,
+     "16": 0.0,
+     "17": 0.0,
+     "18": 8.12860725717184,
+     "19": 6554.8977620000005,
+     "20": 2180.4255475,
+     "21": 54.013324361566845,
+     "22": 524.9079712139195,
+     "23": 11.169148
+    },
+    "hour_share_of_sampled": {
+     "00": 0.1170281777986153,
+     "01": 0.0023649063984151806,
+     "02": 0.0,
+     "03": 0.0,
+     "04": 9.092652750702278e-06,
+     "05": 0.000300776394861941,
+     "06": 0.0,
+     "07": 0.0005494411551606189,
+     "08": 0.0002204816096795184,
+     "09": 0.0,
+     "10": 0.00012610884936027134,
+     "11": 0.0,
+     "12": 0.0,
+     "13": 0.0,
+     "14": 0.0,
+     "15": 0.0,
+     "16": 0.0,
+     "17": 0.0,
+     "18": 0.0007658727198818771,
+     "19": 0.6175987126332436,
+     "20": 0.20543844618527785,
+     "21": 0.005089104483693318,
+     "22": 0.04945652839194418,
+     "23": 0.0010523507271157598
+    },
+    "fixed_hours_share_of_sampled": 0.0,
+    "largest_hour": "19",
+    "largest_hour_share_of_sampled": 0.6175987126332436,
+    "expanded_from_all_hours_usd": 1248415.5706346405,
+    "expanded_from_fixed_hours_usd": 0.0,
+    "fixed_window_bias_factor": null,
+    "reference_usd": 3122279.0,
+    "ratio_all_hours_to_reference": 0.3998411322737784,
+    "ratio_fixed_hours_to_reference": 0.0
+   },
+   {
+    "day": "2025-11-14",
+    "hours_usable": 24,
+    "blocks_observed": 1194,
+    "usd_per_hour_window": {
+     "00": 223.7323184583375,
+     "01": 11.016714902295476,
+     "02": 76.6175070677848,
+     "03": 460.8134111959306,
+     "04": 308.5389524160789,
+     "05": 26.92234288037765,
+     "06": 2016.3007596556101,
+     "07": 6979.426172115679,
+     "08": 247.02885478472368,
+     "09": 3171.894808506206,
+     "10": 3981.275725609579,
+     "11": 3175.0127732727415,
+     "12": 27677.808295241746,
+     "13": 3073.7763551399153,
+     "14": 13596.079564258429,
+     "15": 38847.59788689298,
+     "16": 16716.431848642704,
+     "17": 1176.1161755626981,
+     "18": 288058.9697417799,
+     "19": 4402.60589593089,
+     "20": 15215.611201006763,
+     "21": 44.24475791125373,
+     "22": 915.6697996449374,
+     "23": 449.34900814070465
+    },
+    "hour_share_of_sampled": {
+     "00": 0.0005192778072578959,
+     "01": 2.5569553818013427e-05,
+     "02": 0.00017782755456107415,
+     "03": 0.0010695378270324124,
+     "04": 0.0007161121458369224,
+     "05": 6.248616772713174e-05,
+     "06": 0.004679789868808635,
+     "07": 0.01619909516670697,
+     "08": 0.0005733485574455692,
+     "09": 0.007361898327266123,
+     "10": 0.009240453695421794,
+     "11": 0.007369135055148042,
+     "12": 0.0642395863963387,
+     "13": 0.007134167547615388,
+     "14": 0.031556202662543435,
+     "15": 0.09016442321317442,
+     "16": 0.038798471921059,
+     "17": 0.0027297398647413928,
+     "18": 0.668578554941023,
+     "19": 0.010218351785798881,
+     "20": 0.035315100093680864,
+     "21": 0.00010269111333189284,
+     "22": 0.0021252495348384063,
+     "23": 0.0010429291988241142
+    },
+    "fixed_hours_share_of_sampled": 0.09123396104020683,
+    "largest_hour": "18",
+    "largest_hour_share_of_sampled": 0.668578554941023,
+    "expanded_from_all_hours_usd": 50372921.33066526,
+    "expanded_from_fixed_hours_usd": 54840343.85430279,
+    "fixed_window_bias_factor": 0.9185376638865291,
+    "reference_usd": 152283590.0,
+    "ratio_all_hours_to_reference": 0.3307836473428638,
+    "ratio_fixed_hours_to_reference": 0.36011985174701217
+   },
+   {
+    "day": "2026-05-13",
+    "hours_usable": 24,
+    "blocks_observed": 1194,
+    "usd_per_hour_window": {
+     "00": 516.2458510426304,
+     "01": 421.6685973145431,
+     "02": 4826.621369618955,
+     "03": 127.73577383951147,
+     "04": 4882.535137418802,
+     "05": 40.04985747920167,
+     "06": 176.27895174338795,
+     "07": 339.6298245723347,
+     "08": 46.51733312061184,
+     "09": 15541.91704870345,
+     "10": 26914.75876994453,
+     "11": 0.0,
+     "12": 496.2285412234156,
+     "13": 39271.51515821292,
+     "14": 1080.2486675646182,
+     "15": 23845.844040863085,
+     "16": 1253415.2982396334,
+     "17": 923.8867497131943,
+     "18": 2536.0685961096406,
+     "19": 843.1683327732101,
+     "20": 7136.153009099483,
+     "21": 482.40151001811086,
+     "22": 1805.052753694526,
+     "23": 7127.888416960856
+    },
+    "hour_share_of_sampled": {
+     "00": 0.00037065386193421435,
+     "01": 0.0003027493465281373,
+     "02": 0.0034654144863931133,
+     "03": 9.171164821014824e-05,
+     "04": 0.003505559417201661,
+     "05": 2.875497074620584e-05,
+     "06": 0.00012656464765661865,
+     "07": 0.00024384720158337946,
+     "08": 3.339848472043473e-05,
+     "09": 0.011158775541398854,
+     "10": 0.019324241078082588,
+     "11": 0.0,
+     "12": 0.000356281846788638,
+     "13": 0.028196137030450718,
+     "14": 0.000775596239027306,
+     "15": 0.017120823667592062,
+     "16": 0.8999263044180493,
+     "17": 0.0006633316104709309,
+     "18": 0.001820844888883177,
+     "19": 0.0006053774537303073,
+     "20": 0.005123610517806886,
+     "21": 0.0003463543238749325,
+     "22": 0.0012959906075770391,
+     "23": 0.005117676711293368
+    },
+    "fixed_hours_share_of_sampled": 0.017212535315802212,
+    "largest_hour": "16",
+    "largest_hour_share_of_sampled": 0.8999263044180493,
+    "expanded_from_all_hours_usd": 160179130.39361504,
+    "expanded_from_fixed_hours_usd": 33075149.391354438,
+    "fixed_window_bias_factor": 4.8428845626162005,
+    "reference_usd": 55924660.0,
+    "ratio_all_hours_to_reference": 2.8641949793456956,
+    "ratio_fixed_hours_to_reference": 0.5914233433221487
+   }
+  ],
+  "fetched_at": "2026-11-07T11:16:39+00:00",
+  "complete": true,
+  "days_total": 3,
+  "days_with_defined_factor": 2,
+  "days_with_unbounded_factor": [
+   "2025-05-18"
+  ],
+  "unbounded_factor_reading": "on these days the two fixed windows observed no volume while other hours did, so the factor is unbounded rather than missing; the verdict is required to hold both excluding them and treating them as infinite (which moves the median to the largest defined factor)",
+  "validation_median_factor": 2.880711113251365,
+  "validation_mean_factor": 2.880711113251365,
+  "validation_median_factor_unbounded_as_infinite": 4.8428845626162005,
+  "motivating_median_factor": 2.8197878661858384,
+  "ratio_validation_over_motivating": 1.021605613598137,
+  "ratio_validation_over_motivating_unbounded_as_infinite": 1.7174641471051104,
+  "validation_ratio_all_hours_to_reference_median": 0.3998411322737784,
+  "within_declared_range": true,
+  "verdict": "validation days reproduce the motivating factor within the declared x0.5-x2 range (also when the day with an unbounded factor is treated as infinite)"
+ },
+ "systematic_day": {
+  "rule": {
+   "declared": "2026-11-07, before any block of this design was read",
+   "day": "the chronologically middle of the three validation days (selected earlier by position, not by volume): 2025-11-14",
+   "design": "systematic sample of every 40th block from the first block at or after 00:00 UTC to the last block before 00:00 UTC of the next day, with a random start offset in [0, 40) drawn from seed 20261107; about 2.5% of the day's blocks, spread over the whole day instead of 24 fifty-block windows",
+   "estimator": "day volume = sum of the sampled blocks' half-gross participant notional x step; design-based standard error from successive differences",
+   "what_it_establishes": "whether the day's total under our definition is compatible with the reference once intraday selection is replaced by an even spread with a quantified sampling error; one day, so it bounds the sampling component for that day, not the global total"
+  },
+  "assumptions": [
+   "the successive-difference variance estimator assumes that adjacent sampled blocks behave like a stratified sample of pairs; it is conservative under smooth trends and understates the error when the volume process has a periodic or dependent component at the sampling interval or a divisor of it, which a single systematic start cannot detect from the selected blocks alone",
+   "the percentile bootstrap resamples the selected blocks as if independent; it is a second approximation that shares the same unobserved blocks, not an independent observation of the error",
+   "the normal interval is approximate for a volume concentrated in a few blocks",
+   "skipped heights (null blocks) are not population units; the mean is taken over existing sampled blocks and scaled to the heights of the day"
+  ],
+  "status": "complete",
+  "day": "2025-11-14",
+  "fetched_at": "2026-11-08T00:21:04+00:00",
+  "design": {
+   "step": 40,
+   "offset": 36,
+   "heights_in_day": 139853,
+   "blocks_in_day_estimated": 139573,
+   "blocks_requested": 3496,
+   "blocks_fetched": 3489,
+   "heights_without_block": 7,
+   "fetch_failed": 0,
+   "blocks_missing": 7,
+   "sampling_fraction": 0.024997671469410274
+  },
+  "sampled_usd": 1172470.014486787,
+  "blocks_with_volume": 1552,
+  "share_of_sampled_usd_in_top_1pct_blocks": 0.8953163380177444,
+  "estimate_usd": 46903169.19804079,
+  "standard_error_usd": 13484546.111470466,
+  "ci95_usd": [
+   20473458.819558676,
+   73332879.5765229
+  ],
+  "relative_standard_error": 0.2874975474372366,
+  "ci95_usd_bootstrap": [
+   23979106.12170579,
+   76354214.46335386
+  ],
+  "reference_usd": 152283590.0,
+  "ratio_to_reference": 0.3079988408340044,
+  "ratio_ci95": [
+   0.13444297458155982,
+   0.48155470708644904
+  ],
+  "ratio_ci95_bootstrap": [
+   0.15746349374680352,
+   0.5013948939826928
+  ],
+  "reference_inside_ci95": false,
+  "reference_inside_ci95_bootstrap": false,
+  "usd_by_hour": {
+   "00": 11636.705480901948,
+   "01": 19889.79505757465,
+   "02": 24824.494468137003,
+   "03": 2571.411010974865,
+   "04": 178606.30697499492,
+   "05": 38561.02817505263,
+   "06": 12473.295168504319,
+   "07": 92490.30225778818,
+   "08": 14824.768531308411,
+   "09": 21856.233075952292,
+   "10": 253230.80244877766,
+   "11": 31671.19896126798,
+   "12": 48806.70596558765,
+   "13": 188079.70584775408,
+   "14": 30501.546401012587,
+   "15": 59208.42792519971,
+   "16": 55654.38328308596,
+   "17": 28180.300697849732,
+   "18": 8697.43781270452,
+   "19": 16777.28296204371,
+   "20": 22062.66088324838,
+   "21": 3334.210828035522,
+   "22": 8033.776164425651,
+   "23": 497.23410460460957
+  },
+  "same_day_other_designs": {
+   "two_fixed_windows_ratio": 0.36011985174701217,
+   "twenty_four_hourly_windows_ratio": 0.3307836473428638,
+   "blocks_observed_24_windows": 1194
+  },
+  "coverage_diagnostic": {
+   "rule": {
+    "declared": "2026-11-08, before the diagnostic was computed",
+    "proxy_population": "the 24 fifty-block hourly windows of the same day (consecutive blocks), whose total is known; every one of the step phases is applied to it and the estimate and its design standard error are computed for each phase",
+    "checks": [
+     "ratio of the standard deviation of the estimates across phases (the true design error on this population) to the mean successive-difference standard error",
+     "share of phases whose 95% normal interval covers the known total",
+     "autocorrelation of the per-block volume within windows at lags 1 to 50, flagging the sampling step and its divisors"
+    ],
+    "verdict": "the design interval is considered supported on the proxy if the ratio is at most 1.5 and the coverage is at least 0.80; otherwise the sampling reading is inconclusive and the day's verdict is downgraded",
+    "limits": "the proxy has about 30 blocks per phase and is made of discontiguous windows, so it tests the error estimator on this day's volume process at short range, not the whole-day design"
+   },
+   "proxy_blocks": 1200,
+   "proxy_windows": 24,
+   "proxy_total_usd": 430852.8408710183,
+   "phases_evaluated": 40,
+   "blocks_per_phase_mean": 30.0,
+   "sd_of_estimates_across_phases_usd": 1636514.9790863814,
+   "mean_successive_difference_se_usd": 432773.4760560858,
+   "ratio_true_sd_to_estimated_se": 3.7814585912245122,
+   "estimated_error_zero_while_phases_disagree": false,
+   "normal_interval_coverage": 0.275,
+   "autocorrelation_threshold": 0.05832118435198043,
+   "autocorrelation_flagged_at_step_or_divisors": {
+    "4": 0.08654801892359985
+   },
+   "largest_autocorrelations": {
+    "3": 0.11863279192820708,
+    "4": 0.08654801892359985,
+    "47": -0.045613207495204436,
+    "48": -0.034076289378183605,
+    "49": -0.03309034520439808
+   },
+   "supported": false,
+   "post_hoc_by_step": {
+    "kind": "exploratory, not part of the declared verdict",
+    "steps": {
+     "5": {
+      "blocks_per_phase": 240,
+      "ratio_true_sd_to_estimated_se": 2.1389918599872604,
+      "normal_interval_coverage": 0.4,
+      "phases": 5
+     },
+     "8": {
+      "blocks_per_phase": 150,
+      "ratio_true_sd_to_estimated_se": 2.032593518465582,
+      "normal_interval_coverage": 0.5,
+      "phases": 8
+     },
+     "10": {
+      "blocks_per_phase": 120,
+      "ratio_true_sd_to_estimated_se": 2.627621827781302,
+      "normal_interval_coverage": 0.4,
+      "phases": 10
+     },
+     "20": {
+      "blocks_per_phase": 60,
+      "ratio_true_sd_to_estimated_se": 3.172840331762724,
+      "normal_interval_coverage": 0.45,
+      "phases": 20
+     },
+     "40": {
+      "blocks_per_phase": 30,
+      "ratio_true_sd_to_estimated_se": 3.7814585912245122,
+      "normal_interval_coverage": 0.275,
+      "phases": 40
+     }
+    },
+    "reading": "ratio and coverage as the blocks per phase grow; the declared design has about 3,500 blocks per phase, far beyond what this proxy can hold"
+   },
+   "reading": "on the proxy population the successive-difference error understates the true design error or the interval under-covers; the sampling reading for this day is inconclusive"
+  },
+  "coverage_simulation": {
+   "concentrated_iid": {
+    "normal_interval_coverage": 0.85,
+    "bootstrap_coverage": 0.85,
+    "relative_error_sd": 0.29662887584914027,
+    "phases": 40
+   },
+   "dependent_bursts": {
+    "normal_interval_coverage": 0.85,
+    "bootstrap_coverage": 0.875,
+    "relative_error_sd": 0.2749354848344905,
+    "phases": 40
+   },
+   "periodic_at_step": {
+    "normal_interval_coverage": 0.0,
+    "bootstrap_coverage": 0.0,
+    "relative_error_sd": 6.244997998398398,
+    "phases": 40
+   },
+   "periodic_off_step": {
+    "normal_interval_coverage": 1.0,
+    "bootstrap_coverage": 1.0,
+    "relative_error_sd": 0.005178625249013137,
+    "phases": 40
+   },
+   "reading": "for concentrated independent volume and for dependent bursts the intervals cover the total in about 85% and 85% of phases, below the nominal 95%: with a heavy-tailed volume the intervals are somewhat too narrow and should be read as indicative; for a pattern periodic at the sampling step both intervals fail completely (the sample sees one phase only), while a period that is not a divisor of the step is handled; this is why the real-data diagnostic on the proxy population matters",
+   "settings": {
+    "step": 40,
+    "blocks": 140000,
+    "phases": 40,
+    "seed": 20261108,
+    "bootstrap_draws": 200
+   }
+  },
+  "sampling_verdict": "inconclusive: the error estimator is not supported on the proxy population",
+  "reading": "on this day the even 40-block systematic sample estimates 0.31 of the reference with a 95% design interval of 0.13 to 0.48 (percentile bootstrap 0.16 to 0.50); both intervals are approximations under the stated assumptions and share the same unobserved blocks; the sampling error cannot be bounded with this design on this day (inconclusive: the error estimator is not supported on the proxy population), so the gap to the reference is not attributed; one day cannot establish the global total"
+ },
+ "complete_days": {
+  "rule": {
+   "declared": "2026-11-08, before the first complete day was read from BigQuery",
+   "population": "every successful intents.near event log of the committed sample days, read complete from the NEAR public BigQuery dataset (bigquery-public-data.crypto_near_mainnet_us.execution_outcomes); the days are the committed sample days, none chosen by result",
+   "measure": "the same valuation pipeline as the block sample (half-gross participant notional per receipt, daily prices), so the only difference from the sampled estimate is coverage: every block of the day instead of two 50-block windows",
+   "what_it_establishes": "per day, the ratio of our complete-day volume to the reference removes sampling error entirely: what remains is the definition of the reference, reconstruction or pricing. The ratio of the sampled expansion to the complete day is the measured expansion error of the two-window design, no longer a sensitivity",
+   "not_a_change_of_the_declared_estimator": "the committed block-sample estimate and its failed tolerance check stay as declared; the complete days are published beside them"
+  },
+  "status": "complete",
+  "files": [
+   "l2_full_days_valued.csv",
+   "l2_full_days_valued_2.csv"
+  ],
+  "days": [
+   {
+    "day": "2024-11-19",
+    "complete_usd": 656.8544651180231,
+    "receipts_valued": 27,
+    "receipts_with_token_diff": 27,
+    "legs": 155,
+    "legs_unpriced": 9,
+    "reference_usd": null,
+    "ratio_complete_to_reference": null,
+    "sampled_expanded_usd": 0.0,
+    "ratio_sampled_to_complete": 0.0
+   },
+   {
+    "day": "2024-12-04",
+    "complete_usd": 30247.985412256166,
+    "receipts_valued": 348,
+    "receipts_with_token_diff": 348,
+    "legs": 1673,
+    "legs_unpriced": 251,
+    "reference_usd": null,
+    "ratio_complete_to_reference": null,
+    "sampled_expanded_usd": 21753.264779399997,
+    "ratio_sampled_to_complete": 0.7191640859025872
+   },
+   {
+    "day": "2024-12-19",
+    "complete_usd": 72476.79174403481,
+    "receipts_valued": 117,
+    "receipts_with_token_diff": 123,
+    "legs": 694,
+    "legs_unpriced": 107,
+    "reference_usd": 153660.0,
+    "ratio_complete_to_reference": 0.47166986687514517,
+    "sampled_expanded_usd": 0.0,
+    "ratio_sampled_to_complete": 0.0
+   },
+   {
+    "day": "2025-01-03",
+    "complete_usd": 61331.816609581634,
+    "receipts_valued": 88,
+    "receipts_with_token_diff": 88,
+    "legs": 482,
+    "legs_unpriced": 21,
+    "reference_usd": 120960.0,
+    "ratio_complete_to_reference": 0.5070421346691604,
+    "sampled_expanded_usd": 0.0,
+    "ratio_sampled_to_complete": 0.0
+   },
+   {
+    "day": "2025-01-18",
+    "complete_usd": 84010.68452265103,
+    "receipts_valued": 218,
+    "receipts_with_token_diff": 218,
+    "legs": 1328,
+    "legs_unpriced": 287,
+    "reference_usd": 149349.0,
+    "ratio_complete_to_reference": 0.5625125345509581,
+    "sampled_expanded_usd": 123544.43163454,
+    "ratio_sampled_to_complete": 1.4705799903490828
+   },
+   {
+    "day": "2025-02-02",
+    "complete_usd": 122165.20025866706,
+    "receipts_valued": 66,
+    "receipts_with_token_diff": 67,
+    "legs": 376,
+    "legs_unpriced": 38,
+    "reference_usd": 247422.0,
+    "ratio_complete_to_reference": 0.4937523755311454,
+    "sampled_expanded_usd": 0.0,
+    "ratio_sampled_to_complete": 0.0
+   },
+   {
+    "day": "2025-02-17",
+    "complete_usd": 664917.6670874256,
+    "receipts_valued": 169,
+    "receipts_with_token_diff": 169,
+    "legs": 1086,
+    "legs_unpriced": 28,
+    "reference_usd": 1297684.0,
+    "ratio_complete_to_reference": 0.5123879673999414,
+    "sampled_expanded_usd": 0.0,
+    "ratio_sampled_to_complete": 0.0
+   },
+   {
+    "day": "2025-03-04",
+    "complete_usd": 430350.0297441694,
+    "receipts_valued": 253,
+    "receipts_with_token_diff": 253,
+    "legs": 1524,
+    "legs_unpriced": 50,
+    "reference_usd": 885041.0,
+    "ratio_complete_to_reference": 0.48624869327428827,
+    "sampled_expanded_usd": 0.0,
+    "ratio_sampled_to_complete": 0.0
+   },
+   {
+    "day": "2025-03-19",
+    "complete_usd": 192173.37089740907,
+    "receipts_valued": 192,
+    "receipts_with_token_diff": 192,
+    "legs": 1030,
+    "legs_unpriced": 6,
+    "reference_usd": 380707.0,
+    "ratio_complete_to_reference": 0.5047802401779033,
+    "sampled_expanded_usd": 0.0,
+    "ratio_sampled_to_complete": 0.0
+   },
+   {
+    "day": "2025-04-03",
+    "complete_usd": 177693.33473425786,
+    "receipts_valued": 482,
+    "receipts_with_token_diff": 487,
+    "legs": 3041,
+    "legs_unpriced": 571,
+    "reference_usd": 364243.0,
+    "ratio_complete_to_reference": 0.4878428267235276,
+    "sampled_expanded_usd": 53313.79682877947,
+    "ratio_sampled_to_complete": 0.3000326202922061
+   },
+   {
+    "day": "2025-04-18",
+    "complete_usd": 592790.266462439,
+    "receipts_valued": 1813,
+    "receipts_with_token_diff": 1824,
+    "legs": 8962,
+    "legs_unpriced": 173,
+    "reference_usd": 1173508.0,
+    "ratio_complete_to_reference": 0.505143779558758,
+    "sampled_expanded_usd": 969964.3066616363,
+    "ratio_sampled_to_complete": 1.6362689496405494
+   },
+   {
+    "day": "2025-05-03",
+    "complete_usd": 526465.84546678,
+    "receipts_valued": 994,
+    "receipts_with_token_diff": 1058,
+    "legs": 4911,
+    "legs_unpriced": 820,
+    "reference_usd": 1051610.0,
+    "ratio_complete_to_reference": 0.5006284130683238,
+    "sampled_expanded_usd": 157.12521437,
+    "ratio_sampled_to_complete": 0.0002984528164988333
+   },
+   {
+    "day": "2025-05-18",
+    "complete_usd": 1584051.1506613214,
+    "receipts_valued": 1302,
+    "receipts_with_token_diff": 1380,
+    "legs": 7941,
+    "legs_unpriced": 1483,
+    "reference_usd": 3122279.0,
+    "ratio_complete_to_reference": 0.5073381176574295,
+    "sampled_expanded_usd": 0.0,
+    "ratio_sampled_to_complete": 0.0
+   },
+   {
+    "day": "2025-06-02",
+    "complete_usd": 561533.0854759939,
+    "receipts_valued": 1288,
+    "receipts_with_token_diff": 1348,
+    "legs": 8440,
+    "legs_unpriced": 1508,
+    "reference_usd": 1112743.0,
+    "ratio_complete_to_reference": 0.5046386141957253,
+    "sampled_expanded_usd": 2818450.268993624,
+    "ratio_sampled_to_complete": 5.019206066200912
+   },
+   {
+    "day": "2025-06-17",
+    "complete_usd": 4236794.024338017,
+    "receipts_valued": 2198,
+    "receipts_with_token_diff": 2241,
+    "legs": 16882,
+    "legs_unpriced": 4076,
+    "reference_usd": 8451447.0,
+    "ratio_complete_to_reference": 0.5013098969132762,
+    "sampled_expanded_usd": 1877226.1212540758,
+    "ratio_sampled_to_complete": 0.4430770319421854
+   },
+   {
+    "day": "2025-07-02",
+    "complete_usd": 4553950.577947399,
+    "receipts_valued": 6240,
+    "receipts_with_token_diff": 6298,
+    "legs": 43430,
+    "legs_unpriced": 1265,
+    "reference_usd": 9147991.0,
+    "ratio_complete_to_reference": 0.4978088170339694,
+    "sampled_expanded_usd": 484348.9307880822,
+    "ratio_sampled_to_complete": 0.10635796820754974
+   },
+   {
+    "day": "2025-07-17",
+    "complete_usd": 3092413.563460036,
+    "receipts_valued": 4228,
+    "receipts_with_token_diff": 4339,
+    "legs": 28220,
+    "legs_unpriced": 6096,
+    "reference_usd": 6036775.0,
+    "ratio_complete_to_reference": 0.5122625182253829,
+    "sampled_expanded_usd": 0.05737392000000001,
+    "ratio_sampled_to_complete": 1.8553120021827076e-08
+   },
+   {
+    "day": "2025-08-01",
+    "complete_usd": 8135809.3396231085,
+    "receipts_valued": 4390,
+    "receipts_with_token_diff": 4420,
+    "legs": 28412,
+    "legs_unpriced": 5481,
+    "reference_usd": 16342213.0,
+    "ratio_complete_to_reference": 0.4978401235881033,
+    "sampled_expanded_usd": 0.0,
+    "ratio_sampled_to_complete": 0.0
+   },
+   {
+    "day": "2025-08-16",
+    "complete_usd": 1755008.134713058,
+    "receipts_valued": 7621,
+    "receipts_with_token_diff": 8100,
+    "legs": 53327,
+    "legs_unpriced": 11159,
+    "reference_usd": 3518826.0,
+    "ratio_complete_to_reference": 0.4987482003125639,
+    "sampled_expanded_usd": 60769.73301914878,
+    "ratio_sampled_to_complete": 0.03462646800157685
+   },
+   {
+    "day": "2025-08-31",
+    "complete_usd": 2161626.7138305334,
+    "receipts_valued": 8532,
+    "receipts_with_token_diff": 8605,
+    "legs": 52870,
+    "legs_unpriced": 10790,
+    "reference_usd": 4216251.0,
+    "ratio_complete_to_reference": 0.5126892857731984,
+    "sampled_expanded_usd": 819559.1961100259,
+    "ratio_sampled_to_complete": 0.37914002027561794
+   },
+   {
+    "day": "2025-09-15",
+    "complete_usd": 10067804.299072072,
+    "receipts_valued": 30290,
+    "receipts_with_token_diff": 30479,
+    "legs": 166219,
+    "legs_unpriced": 44833,
+    "reference_usd": 20074418.0,
+    "ratio_complete_to_reference": 0.501524093952416,
+    "sampled_expanded_usd": 2927716.227133149,
+    "ratio_sampled_to_complete": 0.2907998745469248
+   },
+   {
+    "day": "2025-09-30",
+    "complete_usd": 13371334.039881065,
+    "receipts_valued": 14527,
+    "receipts_with_token_diff": 14652,
+    "legs": 93430,
+    "legs_unpriced": 8103,
+    "reference_usd": 26490805.0,
+    "ratio_complete_to_reference": 0.5047537830534431,
+    "sampled_expanded_usd": 915557.7736961086,
+    "ratio_sampled_to_complete": 0.06847168509629517
+   },
+   {
+    "day": "2025-10-15",
+    "complete_usd": 17820885.839919113,
+    "receipts_valued": 12362,
+    "receipts_with_token_diff": 12545,
+    "legs": 75385,
+    "legs_unpriced": 7533,
+    "reference_usd": 34929758.0,
+    "ratio_complete_to_reference": 0.5101920786258843,
+    "sampled_expanded_usd": 1800176.289036355,
+    "ratio_sampled_to_complete": 0.1010149722750553
+   },
+   {
+    "day": "2025-10-30",
+    "complete_usd": 47626018.8854405,
+    "receipts_valued": 22811,
+    "receipts_with_token_diff": 23038,
+    "legs": 143147,
+    "legs_unpriced": 12702,
+    "reference_usd": 94578470.0,
+    "ratio_complete_to_reference": 0.503560893778896,
+    "sampled_expanded_usd": 106399.49106305602,
+    "ratio_sampled_to_complete": 0.0022340622532189616
+   },
+   {
+    "day": "2025-11-14",
+    "complete_usd": 76526364.91405135,
+    "receipts_valued": 95757,
+    "receipts_with_token_diff": 95829,
+    "legs": 565618,
+    "legs_unpriced": 8503,
+    "reference_usd": 152283590.0,
+    "ratio_complete_to_reference": 0.5025253536119771,
+    "sampled_expanded_usd": 54840343.854302794,
+    "ratio_sampled_to_complete": 0.7166202643480497
+   },
+   {
+    "day": "2025-11-29",
+    "complete_usd": 25824370.43428259,
+    "receipts_valued": 20814,
+    "receipts_with_token_diff": 20991,
+    "legs": 143592,
+    "legs_unpriced": 11283,
+    "reference_usd": 53183948.0,
+    "ratio_complete_to_reference": 0.4855670066893603,
+    "sampled_expanded_usd": 25459786.43737798,
+    "ratio_sampled_to_complete": 0.9858821728943056
+   },
+   {
+    "day": "2025-12-14",
+    "complete_usd": 24192197.608848456,
+    "receipts_valued": 17380,
+    "receipts_with_token_diff": 17463,
+    "legs": 112902,
+    "legs_unpriced": 9740,
+    "reference_usd": 48074858.0,
+    "ratio_complete_to_reference": 0.503219325345661,
+    "sampled_expanded_usd": 18515929.372908756,
+    "ratio_sampled_to_complete": 0.7653678128908981
+   },
+   {
+    "day": "2025-12-29",
+    "complete_usd": 32170900.71786042,
+    "receipts_valued": 22603,
+    "receipts_with_token_diff": 22679,
+    "legs": 151675,
+    "legs_unpriced": 12416,
+    "reference_usd": 64192492.0,
+    "ratio_complete_to_reference": 0.5011629820799046,
+    "sampled_expanded_usd": 29143060.708278015,
+    "ratio_sampled_to_complete": 0.905882647298668
+   },
+   {
+    "day": "2026-01-13",
+    "complete_usd": 60621446.870719075,
+    "receipts_valued": 28756,
+    "receipts_with_token_diff": 28856,
+    "legs": 202991,
+    "legs_unpriced": 15479,
+    "reference_usd": 120186156.0,
+    "ratio_complete_to_reference": 0.5043962540138074,
+    "sampled_expanded_usd": 931616.4386916555,
+    "ratio_sampled_to_complete": 0.01536776977095936
+   },
+   {
+    "day": "2026-01-28",
+    "complete_usd": 48366073.44123813,
+    "receipts_valued": 25763,
+    "receipts_with_token_diff": 25873,
+    "legs": 191050,
+    "legs_unpriced": 11239,
+    "reference_usd": 118980772.0,
+    "ratio_complete_to_reference": 0.4065032746739795,
+    "sampled_expanded_usd": 28105901.426698778,
+    "ratio_sampled_to_complete": 0.581107777145601
+   },
+   {
+    "day": "2026-02-12",
+    "complete_usd": 42759496.129580975,
+    "receipts_valued": 24639,
+    "receipts_with_token_diff": 24737,
+    "legs": 162015,
+    "legs_unpriced": 10871,
+    "reference_usd": 85245338.0,
+    "ratio_complete_to_reference": 0.5016050980944081,
+    "sampled_expanded_usd": 12599451.532971516,
+    "ratio_sampled_to_complete": 0.29465855946453096
+   },
+   {
+    "day": "2026-02-27",
+    "complete_usd": 30968922.984002106,
+    "receipts_valued": 22432,
+    "receipts_with_token_diff": 22511,
+    "legs": 150628,
+    "legs_unpriced": 9341,
+    "reference_usd": 61832328.0,
+    "ratio_complete_to_reference": 0.5008532588972245,
+    "sampled_expanded_usd": 39799680.74733739,
+    "ratio_sampled_to_complete": 1.285149011087569
+   },
+   {
+    "day": "2026-03-14",
+    "complete_usd": 18548049.047517233,
+    "receipts_valued": 17468,
+    "receipts_with_token_diff": 17577,
+    "legs": 110448,
+    "legs_unpriced": 7574,
+    "reference_usd": 37234825.0,
+    "ratio_complete_to_reference": 0.49813713499438317,
+    "sampled_expanded_usd": 2270539.1108020074,
+    "ratio_sampled_to_complete": 0.12241390482552841
+   },
+   {
+    "day": "2026-03-29",
+    "complete_usd": 18963651.35023678,
+    "receipts_valued": 21945,
+    "receipts_with_token_diff": 22037,
+    "legs": 139042,
+    "legs_unpriced": 7662,
+    "reference_usd": 37921409.0,
+    "ratio_complete_to_reference": 0.5000777094078118,
+    "sampled_expanded_usd": 8744.293111804927,
+    "ratio_sampled_to_complete": 0.0004611080930727903
+   },
+   {
+    "day": "2026-04-13",
+    "complete_usd": 40109333.92383227,
+    "receipts_valued": 29709,
+    "receipts_with_token_diff": 29786,
+    "legs": 191009,
+    "legs_unpriced": 11948,
+    "reference_usd": 80113582.0,
+    "ratio_complete_to_reference": 0.50065585538083,
+    "sampled_expanded_usd": 14953547.97768507,
+    "ratio_sampled_to_complete": 0.372819653552011
+   },
+   {
+    "day": "2026-04-28",
+    "complete_usd": 24384008.342388313,
+    "receipts_valued": 26267,
+    "receipts_with_token_diff": 26310,
+    "legs": 157171,
+    "legs_unpriced": 6752,
+    "reference_usd": 48866836.0,
+    "ratio_complete_to_reference": 0.498988891819972,
+    "sampled_expanded_usd": 26040509.96409449,
+    "ratio_sampled_to_complete": 1.067933934341163
+   },
+   {
+    "day": "2026-05-13",
+    "complete_usd": 26606139.99215864,
+    "receipts_valued": 22809,
+    "receipts_with_token_diff": 23210,
+    "legs": 140037,
+    "legs_unpriced": 8760,
+    "reference_usd": 55924660.0,
+    "ratio_complete_to_reference": 0.47574969596880234,
+    "sampled_expanded_usd": 33075149.391354434,
+    "ratio_sampled_to_complete": 1.2431397189183526
+   },
+   {
+    "day": "2026-05-28",
+    "complete_usd": 41044063.715762295,
+    "receipts_valued": 25215,
+    "receipts_with_token_diff": 25631,
+    "legs": 156205,
+    "legs_unpriced": 9816,
+    "reference_usd": 82392417.0,
+    "ratio_complete_to_reference": 0.4981534127802355,
+    "sampled_expanded_usd": 1489545.3841493977,
+    "ratio_sampled_to_complete": 0.036291371986574575
+   },
+   {
+    "day": "2026-06-12",
+    "complete_usd": 51728098.32480767,
+    "receipts_valued": 24326,
+    "receipts_with_token_diff": 24794,
+    "legs": 145939,
+    "legs_unpriced": 10727,
+    "reference_usd": 102382801.0,
+    "ratio_complete_to_reference": 0.5052420701481656,
+    "sampled_expanded_usd": 23434812.766872555,
+    "ratio_sampled_to_complete": 0.4530383587604984
+   },
+   {
+    "day": "2026-06-27",
+    "complete_usd": 19633475.013928704,
+    "receipts_valued": 22067,
+    "receipts_with_token_diff": 22169,
+    "legs": 146611,
+    "legs_unpriced": 6730,
+    "reference_usd": 39034729.0,
+    "ratio_complete_to_reference": 0.5029745438716561,
+    "sampled_expanded_usd": 36882449.91767702,
+    "ratio_sampled_to_complete": 1.8785492579133987
+   },
+   {
+    "day": "2026-07-12",
+    "complete_usd": 22459840.784793984,
+    "receipts_valued": 22947,
+    "receipts_with_token_diff": 23030,
+    "legs": 147499,
+    "legs_unpriced": 6660,
+    "reference_usd": 44784573.0,
+    "ratio_complete_to_reference": 0.5015084275737983,
+    "sampled_expanded_usd": 719795.579496903,
+    "ratio_sampled_to_complete": 0.03204811585237181
+   },
+   {
+    "day": "2026-07-27",
+    "complete_usd": 28650594.0847217,
+    "receipts_valued": 28512,
+    "receipts_with_token_diff": 29055,
+    "legs": 191194,
+    "legs_unpriced": 9624,
+    "reference_usd": 56904698.0,
+    "ratio_complete_to_reference": 0.5034838087484745,
+    "sampled_expanded_usd": 1673301.745498994,
+    "ratio_sampled_to_complete": 0.05840373643041851
+   },
+   {
+    "day": "2026-08-11",
+    "complete_usd": 39072576.59048137,
+    "receipts_valued": 33661,
+    "receipts_with_token_diff": 34287,
+    "legs": 235733,
+    "legs_unpriced": 9656,
+    "reference_usd": 78242806.0,
+    "ratio_complete_to_reference": 0.49937596295410686,
+    "sampled_expanded_usd": 25202141.2862965,
+    "ratio_sampled_to_complete": 0.6450084300925294
+   },
+   {
+    "day": "2026-08-26",
+    "complete_usd": 62704335.51763591,
+    "receipts_valued": 32820,
+    "receipts_with_token_diff": 33529,
+    "legs": 235988,
+    "legs_unpriced": 11231,
+    "reference_usd": 126010720.0,
+    "ratio_complete_to_reference": 0.49761112005102354,
+    "sampled_expanded_usd": 33148889.155679286,
+    "ratio_sampled_to_complete": 0.5286538623211468
+   },
+   {
+    "day": "2026-09-10",
+    "complete_usd": 64120523.9499987,
+    "receipts_valued": 23342,
+    "receipts_with_token_diff": 24243,
+    "legs": 143515,
+    "legs_unpriced": 6089,
+    "reference_usd": 150771716.0,
+    "ratio_complete_to_reference": 0.425282179251702,
+    "sampled_expanded_usd": 752202.3930594807,
+    "ratio_sampled_to_complete": 0.011731070595213
+   },
+   {
+    "day": "2026-09-25",
+    "complete_usd": 60524041.017794326,
+    "receipts_valued": 28646,
+    "receipts_with_token_diff": 29245,
+    "legs": 172313,
+    "legs_unpriced": 12930,
+    "reference_usd": 180522864.0,
+    "ratio_complete_to_reference": 0.3352707777658254,
+    "sampled_expanded_usd": 55790098.90702745,
+    "ratio_sampled_to_complete": 0.9217841037848898
+   },
+   {
+    "day": "2026-10-10",
+    "complete_usd": 48526060.60595394,
+    "receipts_valued": 20820,
+    "receipts_with_token_diff": 20970,
+    "legs": 126401,
+    "legs_unpriced": 7324,
+    "reference_usd": 153185460.0,
+    "ratio_complete_to_reference": 0.31677980799191996,
+    "sampled_expanded_usd": 54945328.62613093,
+    "ratio_sampled_to_complete": 1.1322849606998466
+   },
+   {
+    "day": "2026-10-25",
+    "complete_usd": 28220584.21540323,
+    "receipts_valued": 15830,
+    "receipts_with_token_diff": 15880,
+    "legs": 78487,
+    "legs_unpriced": 3238,
+    "reference_usd": 89290005.0,
+    "ratio_complete_to_reference": 0.3160553548563832,
+    "sampled_expanded_usd": 48448225.53669091,
+    "ratio_sampled_to_complete": 1.716769049389386
+   }
+  ],
+  "days_total": 48,
+  "days_with_reference": 46,
+  "sql_valuation_check": {
+   "day": "2025-11-14",
+   "blocks_compared": 4662,
+   "blocks_with_volume_python": 2057,
+   "blocks_with_volume_sql": 2056,
+   "python_usd": 1602209.5581231113,
+   "sql_usd": 1602209.5576325355,
+   "sql_over_python_pooled": 0.9999999996938129,
+   "blocks_within_1pct_share": 0.9995138551288284,
+   "blocks_only_in_sql": 0,
+   "blocks_only_in_python": 1,
+   "correlation": 1.0,
+   "passes": true,
+   "tolerance": "pooled SQL/Python within 2% over the locally held blocks; receipts attributed to their execution block on both sides",
+   "what": "SQL valuation of every block of the day against the Python valuation of the blocks held locally (same rule, same prices)"
+  },
+  "two_sided_reading": {
+   "what": "ratio of twice our half-gross complete-day volume to the reference; near 1 means the reference counts both sides of each swap",
+   "pooled": 0.9164962974955893,
+   "median_day": 1.0020162409771292,
+   "p10_p90": [
+    0.8969520461268472,
+    1.0175301962833139
+   ],
+   "days_within_5pct_of_parity": 39,
+   "days": 46
+  },
+  "by_period": {
+   "before_2026-09": {
+    "days": 42,
+    "median_ratio": 0.5014091622435373,
+    "two_sided_days_within_5pct": 39
+   },
+   "from_2026-09": {
+    "days": 4,
+    "median_ratio": 0.3260252928788727,
+    "two_sided_ratios_by_day": [
+     {
+      "day": "2026-09-10",
+      "two_sided_ratio": 0.850564358503404
+     },
+     {
+      "day": "2026-09-25",
+      "two_sided_ratio": 0.6705415555316508
+     },
+     {
+      "day": "2026-10-10",
+      "two_sided_ratio": 0.6335596159838399
+     },
+     {
+      "day": "2026-10-25",
+      "two_sided_ratio": 0.6321107097127664
+     }
+    ]
+   },
+   "reading": "the two-sided reading holds on the days before September 2026 and not on the four days from September 2026, where twice our volume is 0.63 to 0.85 of the reference; candidate explanations, none demonstrated here: confidential intents (volume the reference counts and the public logs do not carry; their share was growing in 2026), legs this pipeline leaves unpriced, or a change in what the reference counts; settling it needs the reference's own definition or its per-day breakdown, neither public"
+  },
+  "pooled_ratio_complete_to_reference": 0.4582481487477946,
+  "ratio_complete_to_reference_median": 0.5010081204885646,
+  "ratio_complete_to_reference_p10_p90": [
+   0.4484760230634236,
+   0.5087650981416569
+  ],
+  "sampled_over_complete_median": 0.29272921700572785,
+  "sampled_over_complete_p10_p90": [
+   0.0,
+   1.340778304866024
+  ],
+  "sampled_over_complete_pooled": 0.5510939929216894,
+  "reading": "the SQL valuation reproduces the Python valuation of the 4,662 locally held blocks of 2025-11-14 (SQL/Python 1.000); with every block of 46 sample days read, our complete-day volume is 0.46 of the reference pooled (median day 0.50); no sampling error remains in this comparison, so this ratio is the definitional and reconstruction gap itself. Twice our half-gross volume is 1.00 of the reference on the median day and within 5% of parity on 39 of 46 days: strong empirical support, on those days, for the reference being a two-sided (full gross) notional; it is not the reference's published definition, and the equivalence is not uniform over the period: on the 4 days from September 2026 twice our volume is 0.85, 0.67, 0.63, 0.63 of the reference, a gap the definition does not explain and that stays open. The two-window expansion gives 0.55 of the complete day pooled (median 0.29): the measured expansion error of the declared estimator"
+ },
+ "trace_examples": [
+  "simple_two_party_fully_priced",
+  "multi_participant_batch",
+  "unpriced_leg_valued_by_other_side",
+  "account_intent_without_any_price",
+  "largest_sampled_batch",
+  "legacy_single_object_event_2024"
+ ],
+ "not_possible_here": [
+  "complete-day extracts (FastNear public rate limit ~0.35 blocks/s; a NEAR day has ~150,000 blocks)",
+  "a reference of independent origin: every public series found (DefiLlama, revenue.near.org, near-intents.org) derives from NEAR's own metrics datasets; the only independent indexer found (Flipside ez_intents) requires an account",
+  "the published definition of volume_amount_usd in dune.near.dataset_near_intents_metrics (one- or two-sided)",
+  "the share of confidential intents in the comparison period (only a cumulative share from a secondary source is available)"
+ ]
+}

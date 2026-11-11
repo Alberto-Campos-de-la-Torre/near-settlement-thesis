@@ -1,0 +1,9 @@
+{
+ "as_of": "2026-11-08",
+ "project": "your-project-id (sandbox, billing disabled)",
+ "queries_billed": 17,
+ "bytes_billed_gb": 1005.9,
+ "free_tier_tib_per_month": 1.0,
+ "note": "every query was dry-run first; the runner passes maximum_bytes_billed; a sandbox project cannot be charged, queries fail once the free tier is used",
+ "free_tier_used_tib": 0.915
+}

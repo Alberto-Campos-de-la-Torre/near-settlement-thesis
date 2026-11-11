@@ -1,0 +1,45 @@
+# Local environments, credentials and private configuration
+.venv/
+__pycache__/
+*.pyc
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*credentials*.json
+*service-account*.json
+# Local caches and generated pages
+.pytest_cache/
+.coverage
+.ipynb_checkpoints/
+data/blocks/cache/
+data/blocks/*.tmp
+data/raw/*.tmp
+data/derived/features_built_at.txt
+site/*.html
+site/docs/
+site/audit/
+site/data/
+*.log
+.DS_Store
+# Video/audio, subtitles and all production materials stay outside this repository
+*.mp4
+*.webm
+*.mov
+*.mkv
+*.avi
+*.mp3
+*.wav
+*.flac
+*.m4a
+*.srt
+*.vtt
+*.ass
+record_demo.py
+finish_export.py
+check_routes.py
+docs/DEMO*
+demo-video*/

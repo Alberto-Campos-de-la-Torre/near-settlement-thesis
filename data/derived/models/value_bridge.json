@@ -1,0 +1,527 @@
+{
+ "as_of": "2026-11-01",
+ "window_days": 365,
+ "market_cap_usd": 5807002813.858446,
+ "average_near_price_usd": 2.0749916790136984,
+ "steps": [
+  {
+   "step": 1,
+   "name": "Settled volume through Intents",
+   "short": "Settled volume",
+   "usd": 32761177210.0,
+   "status": "observed (third-party series)",
+   "source": "DefiLlama dexs/near-intents dailyVolume, a pass-through of dune.near.dataset_near_intents_metrics",
+   "share_of_previous": null
+  },
+  {
+   "step": 2,
+   "name": "Gross swap fees",
+   "short": "Gross fees",
+   "usd": 54155218.0,
+   "status": "observed (third-party series)",
+   "source": "DefiLlama fees/near-intents dailyFees: protocol fee plus affiliate fees across integrators (Dune datasets)",
+   "share_of_previous": 0.0016530302819359524,
+   "note": "take rate 16.5 bps of volume"
+  },
+  {
+   "step": 3,
+   "name": "Net revenue captured by NEAR (NEAR/wNEAR swept into revenue wallets)",
+   "short": "Net captured revenue",
+   "usd": 9312904.05,
+   "status": "observed (adapter wallet receipts)",
+   "source": "DefiLlama dailyRevenue: TRANSFER and wrap.near inflows to fefundsadmin, 1csfundsadmin and buybacks wallets, internal hops excluded",
+   "share_of_previous": 0.17196688322813142,
+   "note": "sweeps are periodic, so a day's receipts can exceed that day's fees"
+  },
+  {
+   "step": 4,
+   "name": "Revenue labelled as buyback (dates on or after 2026-02-23)",
+   "short": "Labelled as buyback",
+   "usd": 7542709.05,
+   "status": "classified by an adapter date rule, not by transaction",
+   "source": "DefiLlama dailyHoldersRevenue = dailyRevenue on or after BUYBACK_START",
+   "share_of_previous": 0.8099201934760618
+  },
+  {
+   "step": 5,
+   "name": "NEAR withdrawn from Intents into buybacks.multisignature.near",
+   "short": "NEAR received by buyback wallet",
+   "usd": 4482150.531897206,
+   "near": 1643862.0814239217,
+   "status": "observed (receipts, valued at the daily NEAR price); attribution to executed purchases inferred",
+   "source": "https://api.nearblocks.io/v1/account/buybacks.multisignature.near/txns?per_page=250 (paginated)",
+   "share_of_previous": 0.5942361692841919,
+   "note": "3081 inbound transfers from intents.near from 2026-03-18 to 2026-11-01; a further 510,068 NEAR arrived from the other revenue wallets (treasury moves, excluded here as the adapter excludes them) and 8,293 NEAR from other accounts. Trace of a pre-declared sample (45 of 3197 receipts, every 80th plus the five largest): 45 match a dip4 native_withdraw of wrapped NEAR from 16 distinct Intents-side accounts; for 16 the funding swap (token_diff of the same account, 16 buying wrap.near) is in the same blocks, for the other 29 it is outside the blocks read and the purchase is not observed. A second pre-declared pass over those found the funding swap within 200 blocks before the withdrawal for 12 more (28 of 45 in total). Population from BigQuery: of 3,197 withdrawals (1,695,932 NEAR) a compatible exchange by the same account is observed for 1,926 (60% of receipts, 69% of the NEAR), in 1,124 of them inside the same receipt as the withdrawal; the sold asset reached the account by a bridge deposit in 0 cases and by an internal transfer in 1,925. These are observed events compatible with funding the withdrawal; the allocation of those exact funds to each withdrawal is not reconciled (amounts per leg, prior balances and intra-block order are not tracked) and stays inferred. Second pass: every withdrawal has some compatible prior flow of wrap.near observed; counting the account that transferred the wrap.near in and bought it itself (one hop upstream), a compatible exchange is observed for 1,926 withdrawals (60% of receipts, 69% of the NEAR); 1,271 (31% of the NEAR) received wrap.near by internal transfer from 88 source accounts with no observed purchase of their own, of which the accounts the L2 layer identifies as solvers account for 59% of that NEAR (a counterparty paying wrap.near directly; its counter-leg is not identified here), 0 received it as a deposit from outside, and 0 (0% of the NEAR) show none of these in the day before; transfer amounts are not kept, so a compatible flow is not a reconciled funding of the withdrawal. Receipts excluded: 0 failed, 0 without an explicit status. The wallet was created 2026-03-18, after the adapter's buyback start 2026-02-23, so labelled revenue before that date cannot be matched to this wallet"
+  },
+  {
+   "step": 6,
+   "name": "Destination at the analysis cutoff (ledger reconstructed from receipts)",
+   "short": "Held in the multisig",
+   "near": 2150197.799594706,
+   "usd": null,
+   "status": "inferred: balance at the cutoff reconstructed from receipts; the snapshot balance is shown separately at its own date",
+   "source": "NearBlocks receipts to 2026-11-01; account snapshot 2026-11-07T00:13:36+00:00",
+   "share_of_previous": 0.9944385847513281,
+   "note": "inbound before the cutoff minus outbound (12,025 NEAR) minus gas, divided by all inbound NEAR before the cutoff. Snapshot balance at fetch 2,202,268 NEAR versus 2,202,268 NEAR reconstructed to the same date (residual -0.3 NEAR); inflows after the cutoff 52,070 NEAR. No burn observed; holding is not supply destruction"
+  }
+ ],
+ "dilution": {
+  "window": [
+   "2025-11-02",
+   "2026-11-01"
+  ],
+  "status": "observed: NearBlocks daily total supply",
+  "measure": "total supply change: protocol issuance net of gas burn; unlocks of already-issued tokens are not dilution of supply",
+  "total_supply_start_near": 1278952620.798204,
+  "total_supply_end_near": 1310576026.3527384,
+  "net_new_total_near": 31623405.554534435,
+  "annual_total_supply_growth": 0.024726018024653573,
+  "circulating_supply_field": {
+   "start": 1249836992.159308,
+   "end": 1249836992.159308,
+   "stale_in_source": true,
+   "last_change": "2025-08-27",
+   "note": "constant in the NearBlocks snapshot over the window, so it is not used"
+  },
+  "net_new_usd_at_average_price": 65618303.387734525,
+  "buyback_near_received_12m": 1643862.0814239217,
+  "buyback_measure": "NEAR withdrawn from Intents into the buyback wallet (observed); purchase attribution inferred",
+  "buyback_to_issuance_ratio": 0.05198244947366874,
+  "note": "buybacks are held, not burned, so they do not reduce supply and are not netted twice: issuance is counted once here and buybacks once above"
+ },
+ "receipts": {
+  "source": "https://api.nearblocks.io/v1/account/buybacks.multisignature.near/txns?per_page=250 (paginated)",
+  "fetched_at": "2026-11-07T00:13:36+00:00",
+  "transfers_in": 3110,
+  "transfers_out": 3,
+  "receipts_excluded": {
+   "failed": 0,
+   "missing_or_invalid_status": 0
+  },
+  "ledger": {
+   "method": "sum of successful inbound TRANSFER receipts minus outbound TRANSFER receipts minus gas of wallet-signed transactions; no storage or staking terms",
+   "reconstructed_balance_at_fetch_near": 2202268.1329241702,
+   "snapshot_balance_at_fetch_near": 2202267.809503736,
+   "unexplained_residual_near": -0.32342043425887823,
+   "unexplained_residual_share_of_inflows": -1.4606035067422615e-07,
+   "reconstructed_balance_at_cutoff_near": 2150197.799594706,
+   "cutoff": "2026-11-01",
+   "inflows_after_cutoff_near": 52070.333329464396,
+   "outflows_after_cutoff_near": 0.0,
+   "gas_paid_near_total": 0.0189541036820643
+  },
+  "near_in_total": 2162222.8185488097,
+  "usd_in_total_at_daily_price": 5680599.332039204,
+  "near_in": 1643862.0814239217,
+  "usd_in_at_daily_price": 4482150.531897206,
+  "purchase_transfers": 3081,
+  "near_in_from_treasury_wallets": 510068.0,
+  "near_in_other": 8292.737124887979,
+  "near_out": 12025.0,
+  "first_inbound": "2026-03-18",
+  "last_inbound_before_cutoff": "2026-11-01",
+  "inbound_by_predecessor_near": {
+   "intents.near": 1643862.0814239217,
+   "1csfundsadmin.sputnik-dao.near": 510068.0,
+   "clingy.near": 3595.0,
+   "52435fe912307fb3a088b8b8f3882781762fc1f0a404e8579c7fb1a964362c8d": 2152.88045,
+   "9c484fa5d2d069569ba063fc555c34e621ccd88fdbb0295fc79bad232621c5c1": 782.28,
+   "5c33c6218d47e00ef229f60da78d0897e1ee9665312550b8afd5f9c7bc6957d2": 767.5600000000001
+  },
+  "share_from_intents_near": 0.7602648845076988,
+  "balance_near_at_fetch": 2202267.809503736,
+  "wallet_created": "2026-03-18",
+  "adapter_buyback_start": "2026-02-23"
+ },
+ "trace": {
+  "fetched_at": "2026-11-07T06:16:18+00:00",
+  "source": "https://mainnet.neardata.xyz/v0/block/{h}",
+  "rule": {
+   "declared": "2026-11-07, before reading any of these blocks",
+   "sample": "inbound TRANSFER receipts from intents.near sorted by block timestamp: every 80th receipt starting at the first, plus the five largest by amount",
+   "what_is_read": "the blocks from the originating transaction's block to the block in which the receipt executed (at most 8): dip4 native_withdraw / intents_executed and nep245 mt_burn events whose receiver and amount match the receipt, plus any dip4 token_diff event of the same Intents account in those blocks",
+   "what_it_establishes": "the NEAR arrived as a withdrawal from an Intents-side account balance (observed for every sampled receipt); the purchase itself is the earlier token_diff of the same account, observed only when it falls inside the blocks read, so purchase attribution for the whole inflow remains inferred"
+  },
+  "wallet": "buybacks.multisignature.near",
+  "receipts_in_snapshot_from_intents_near": 3197,
+  "sampled": 45,
+  "blocks_missing": 0,
+  "matched_native_withdraw": 45,
+  "with_token_diff_in_same_block": 16,
+  "with_wrap_near_bought_in_same_block": 16,
+  "distinct_intents_accounts": 16,
+  "intents_accounts": [
+   "0bcaf3e8753318a5e24741b4bf4b9f56495bace25339bd0fa88db8465eb83bd5",
+   "128507595b5953e712f519831998bef0abe0e4e8d5000f953f6b162defd1b37f",
+   "143f2bb439575c286f4f585163f0e5fb4e464f8ce57ec06ae80741407d3cfb31",
+   "1f2d61f02199e34f617968d15daff0459781486c92ecf3c914e4d3f2ebdf172f",
+   "3306963d8329db40d0663769214b0591b7be73902e909afbf857096f91c843b7",
+   "3a21372c9fe8a111bec4f033b307212f4ad3ccf844ebd53ef2c7c395844e1797",
+   "52a9247f6150f6ab50266381474152df2ec4760a4dfd43846782506bf86be5b0",
+   "533b308dc99dace1dff9b04f802d1c2e0a019730711184f279d36ab5f9a9db08",
+   "560917f9cf9172286c37ed1dfd16552ea70aa15e63b16c1f832f7622a71c4d6d",
+   "569d7384b87f6b1e19cee9a15beb0330e006b6152d1cc2c41ba2af5d7235308c",
+   "5880ad2b362620fadf759cbceb1cd5737ce8c6ed7fb8e9942881e6731f9247dd",
+   "9b60c25879de6b5052a7bda3186ab1d23615c9f6437319c6539e16ef54eedc32",
+   "aa44e433995b5399c8f657db167b3fe168dfe59653ed2bcb2381d4d1a6f82740",
+   "b63fe08372b2fb91b404febc3c893aa7bd99c94e79777c21bbdd722f68405078",
+   "bc6f93c6d4388b65e778d0e492dbf596f007a600e32678024e778c4eab846974",
+   "d499c7f6f32b9bcf07dcbf18b0fcf12b40797590eb2e5bdbace6072b3de8d907"
+  ],
+  "intents_side_balances_at_fetch": {},
+  "full_attribution": {
+   "rule": {
+    "declared": "2026-11-08, before the query ran",
+    "population": "every native_withdraw log of intents.near whose receiver is the buyback wallet on the days with inbound receipts (2026-04-23 to 2026-11-06), from the NEAR public BigQuery dataset",
+    "exchange": "the latest token_diff of the same Intents-side account that bought wrap.near, at or before the withdrawal block, searching back one day of blocks",
+    "origin": "a bridge deposit (mt_mint) or an internal transfer (mt_transfer) of an asset sold in that exchange to the same account, within one day before the exchange",
+    "second_pass": "declared after the first pass showed withdrawals without an own exchange and before running: for every withdrawal, an internal transfer of wrap.near into the withdrawing account (with its source account and whether that source bought wrap.near before the transfer, one hop upstream) or a deposit of wrap.near from outside (mt_mint), within one day of blocks",
+    "what_it_establishes": "the withdrawal is observed for every receipt; the exchange and the transfers are observed events that are compatible with funding the withdrawal (same account, at or before the withdrawal, within the declared range), not a demonstrated allocation of those exact funds: balances are fungible, amounts per leg and prior balances are not reconciled here, and joins by block height do not fix the order of events inside a block. The strongest case is the exchange carried by the same receipt as the withdrawal. Whether the operator intended the withdrawal as a buyback remains an interpretation"
+   },
+   "withdrawals": 3197,
+   "near_total": 1695932.414753386,
+   "distinct_intents_accounts": 1273,
+   "exchange_observed": 1926,
+   "exchange_observed_share": 0.6024397873005943,
+   "exchange_in_same_receipt_as_withdrawal": 1124,
+   "exchange_kind": "compatible prior event of the same account (latest wrap.near purchase at or before the withdrawal), not a demonstrated allocation of those funds",
+   "exchange_observed_near_share": 0.6873975446487456,
+   "blocks_withdrawal_minus_swap": {
+    "median": 0.0,
+    "p90": 157.0,
+    "within_200_blocks": 1767
+   },
+   "origin_deposit_observed": 0,
+   "origin_transfer_in_observed": 1925,
+   "origin_observed_share_of_exchanges": 0.9994807892004154,
+   "sold_assets_top": {
+    "nep141:zec.omft.near": 128,
+    "nep141:nbtc.bridge.near": 86,
+    "nep141:tron-d28a265909efecdcee7c5028585214ea0b96f015.omft.near": 76,
+    "nep141:eth-0xdac17f958d2ee523a2206206994597c13d831ec7.omft.near": 75,
+    "nep141:aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near": 69
+   },
+   "kind": "events observed (public logs); allocation of funds to each withdrawal inferred; intention inferred",
+   "reconciliation_with_nearblocks_snapshot": {
+    "snapshot_receipts": 3197,
+    "snapshot_near": 1695932.414753386,
+    "matched_on_day_and_amount": 3197,
+    "ambiguous_snapshot_receipts": 0,
+    "ambiguous_withdrawals": 0,
+    "matched_pairs_with_alternatives": 0,
+    "method": "maximum-cardinality bipartite matching over the admissible pairs; order-independent",
+    "snapshot_receipts_unmatched": 0,
+    "bigquery_withdrawals_unmatched": 0,
+    "near_ratio_bigquery_over_snapshot": 1.0,
+    "precision": "the NearBlocks snapshot stores deposits as floating-point numbers, so amounts are compared at float64 precision (relative 2^-52) and the match is approximate; BigQuery amounts are exact integers",
+    "kind": "approximate reconciliation by day and amount; not an exact link between the log-emitting receipt and the child transfer receipt (their ids differ by construction)"
+   },
+   "wnear_origin": {
+    "rule": "declared after the first pass showed withdrawals without an own exchange and before running: for every withdrawal, an internal transfer of wrap.near into the withdrawing account (with its source account and whether that source bought wrap.near before the transfer, one hop upstream) or a deposit of wrap.near from outside (mt_mint), within one day of blocks",
+    "classes": {
+     "own_exchange": {
+      "receipts": 1926,
+      "receipt_share": 0.6024397873005943,
+      "near": 1165779.7777916957,
+      "near_share": 0.6873975446487456
+     },
+     "transfer_from_account_that_exchanged": {
+      "receipts": 0,
+      "receipt_share": 0.0,
+      "near": 0.0,
+      "near_share": 0.0
+     },
+     "transfer_without_observed_exchange": {
+      "receipts": 1271,
+      "receipt_share": 0.39756021269940567,
+      "near": 530152.6369616904,
+      "near_share": 0.31260245535125436
+     },
+     "deposit_from_outside": {
+      "receipts": 0,
+      "receipt_share": 0.0,
+      "near": 0.0,
+      "near_share": 0.0
+     },
+     "none_observed": {
+      "receipts": 0,
+      "receipt_share": 0.0,
+      "near": 0.0,
+      "near_share": 0.0
+     }
+    },
+    "exchange_observed_within_one_hop": {
+     "receipts": 1926,
+     "receipt_share": 0.6024397873005943,
+     "near_share": 0.6873975446487456
+    },
+    "distinct_source_accounts_of_transfers": 88,
+    "top_source_accounts_by_near": {
+     "solver-priv-liq.near": 704082.0,
+     "51e8f94d77b5e90dc9852ca6113771e11e8382ce69473a75e313e41665de7cbe": 526164.0,
+     "blockzen-1-main.near": 246919.0,
+     "solver-ref.near": 116806.0,
+     "crux-solver.near": 36862.0
+    },
+    "transfers_from_l2_solver_accounts": {
+     "receipts": 1590,
+     "near_share_of_transfers": 0.5910521737876845,
+     "what": "source accounts that the L2 layer identifies independently as solvers (market makers) from the sampled token_diff events"
+    }
+   },
+   "reading": "of 3,197 withdrawals (1,695,932 NEAR) a compatible exchange by the same account is observed for 1,926 (60% of receipts, 69% of the NEAR), in 1,124 of them inside the same receipt as the withdrawal; the sold asset reached the account by a bridge deposit in 0 cases and by an internal transfer in 1,925. These are observed events compatible with funding the withdrawal; the allocation of those exact funds to each withdrawal is not reconciled (amounts per leg, prior balances and intra-block order are not tracked) and stays inferred. Second pass: every withdrawal has some compatible prior flow of wrap.near observed; counting the account that transferred the wrap.near in and bought it itself (one hop upstream), a compatible exchange is observed for 1,926 withdrawals (60% of receipts, 69% of the NEAR); 1,271 (31% of the NEAR) received wrap.near by internal transfer from 88 source accounts with no observed purchase of their own, of which the accounts the L2 layer identifies as solvers account for 59% of that NEAR (a counterparty paying wrap.near directly; its counter-leg is not identified here), 0 received it as a deposit from outside, and 0 (0% of the NEAR) show none of these in the day before; transfer amounts are not kept, so a compatible flow is not a reconciled funding of the withdrawal"
+  },
+  "funding_swap_found_within_extension": 12,
+  "funding_swap_observed_total": 28,
+  "extension": {
+   "fetched_at": "2026-11-08T04:15:41+00:00",
+   "source": "https://mainnet.neardata.xyz/v0/block/{h}",
+   "rule": {
+    "declared": "2026-11-07, after the first trace was published and before any additional block was read: up to 40 blocks; extended the same day to 200 blocks after 6 of 29 were found within 40, before reading any block beyond the 40th",
+    "population": "the sampled receipts whose Intents account had no token_diff in the blocks between the originating transaction and the receipt",
+    "search": "read the blocks immediately before the originating transaction block, newest first, up to the declared depth (40 blocks is about 45 seconds, 200 about four minutes), and stop at the first block that carries a token_diff event of that Intents account",
+    "what_it_establishes": "whether the funding swap of the withdrawal is visible shortly before it; a swap found this way is an observed exchange of the same Intents-side account, not proof that the withdrawn NEAR was bought with those exact proceeds; the origin of the sold asset (bridge deposit, earlier swap) is not traced"
+   },
+   "blocks_back": 200,
+   "receipts_searched": 29,
+   "blocks_read": 4099,
+   "blocks_missing": 5,
+   "swap_found": 12,
+   "wrap_near_bought": 12,
+   "distance_blocks": [
+    4,
+    16,
+    21,
+    27,
+    37,
+    40,
+    54,
+    56,
+    82,
+    102,
+    119,
+    141
+   ],
+   "first_pass_with_swap_in_range": 16,
+   "sampled": 45
+  },
+  "examples": [
+   {
+    "receipt_id": "CxrBgPRbvY7XscAk4MUnhzrdFgJtD7Aau3ZP1WMKhcX5",
+    "transaction_hash": "BuC2pzbhD1SVerEPW2BXTtbj1ncacsFXEz7mSqQGHBDb",
+    "receipt_block_height": 195271967,
+    "transaction_block_height": 195271963,
+    "blocks_read": [
+     195271963,
+     195271964,
+     195271965,
+     195271966,
+     195271967
+    ],
+    "block_timestamp": 1776961254334462604,
+    "amount_yocto": "714146375047294778819477504",
+    "amount_near": 714.1463750472948,
+    "block_url": "https://mainnet.neardata.xyz/v0/block/195271963",
+    "withdraw_event": {
+     "intent_hash": "7HmGpke9tJat5A1kgKTjEgkdxuutyPDbBXMDvZ9J3wmj",
+     "amount": "714146375047294833086480241",
+     "receipt_id_of_execute_intents": "A3CE1aTz1ChQRivWeys5C9CjP17ASEJcPfhV4g27NhNE",
+     "caller": "intents.near"
+    },
+    "intents_account": "5880ad2b362620fadf759cbceb1cd5737ce8c6ed7fb8e9942881e6731f9247dd",
+    "mt_burn_token": "nep141:wrap.near",
+    "token_diff_same_block": [
+     "A3CE1aTz1ChQRivWeys5C9CjP17ASEJcPfhV4g27NhNE"
+    ],
+    "match": "native_withdraw event with matching receiver and amount",
+    "swap_observed": [
+     {
+      "receipt_id": "A3CE1aTz1ChQRivWeys5C9CjP17ASEJcPfhV4g27NhNE",
+      "sold": [
+       "nep141:zec.omft.near"
+      ],
+      "bought": [
+       "nep141:wrap.near"
+      ]
+     }
+    ]
+   },
+   {
+    "receipt_id": "F5shdRH7ddcMorMnzFk7sMtf23ccibf6dU7gaJ56PLjc",
+    "transaction_hash": "CPTwTGAfGetUo5uZYkYDmf19LPuGWQ5cMBrygmiZ46Ab",
+    "receipt_block_height": 197143168,
+    "transaction_block_height": 197143164,
+    "blocks_read": [
+     197143164,
+     197143165,
+     197143166,
+     197143167,
+     197143168
+    ],
+    "block_timestamp": 1778072648569536809,
+    "amount_yocto": "961379565797092352977797120",
+    "amount_near": 961.3795657970924,
+    "block_url": "https://mainnet.neardata.xyz/v0/block/197143164",
+    "withdraw_event": {
+     "intent_hash": "8nBvMkeAY7QyYpT4UrctwkAyJRW51JXfJvHG1Vhp3zXQ",
+     "amount": "961379565797092335384726360",
+     "receipt_id_of_execute_intents": "Dind81L1fF4tFCsme6wRfSro6LPdbVN3e1YikrrNHFrL",
+     "caller": "intents.near"
+    },
+    "intents_account": "5880ad2b362620fadf759cbceb1cd5737ce8c6ed7fb8e9942881e6731f9247dd",
+    "mt_burn_token": "nep141:wrap.near",
+    "token_diff_same_block": [],
+    "match": "native_withdraw event with matching receiver and amount",
+    "swap_observed": []
+   },
+   {
+    "receipt_id": "CxAy7gcyCNjaEthKfWYCjdtbG9bQtZoXjaausULNpo42",
+    "transaction_hash": "9EcA6NqenxynKYAkDYF1vA5xL8SwhxjPK4zKA27dNpfL",
+    "receipt_block_height": 198806020,
+    "transaction_block_height": 198806016,
+    "blocks_read": [
+     198806016,
+     198806017,
+     198806018,
+     198806019,
+     198806020
+    ],
+    "block_timestamp": 1779078196085380065,
+    "amount_yocto": "772336498098934703355592704",
+    "amount_near": 772.3364980989347,
+    "block_url": "https://mainnet.neardata.xyz/v0/block/198806016",
+    "withdraw_event": {
+     "intent_hash": "7TpwkMknnCpQ98SMqrrZYYLsLpeX1jD7dD3rHRxeUSkk",
+     "amount": "772336498098934729133093368",
+     "receipt_id_of_execute_intents": "HoYsMbKdRmoaECmnJ9vaeaEEpvkQGvw6Z39V5azmXttc",
+     "caller": "intents.near"
+    },
+    "intents_account": "5880ad2b362620fadf759cbceb1cd5737ce8c6ed7fb8e9942881e6731f9247dd",
+    "mt_burn_token": "nep141:wrap.near",
+    "token_diff_same_block": [
+     "HoYsMbKdRmoaECmnJ9vaeaEEpvkQGvw6Z39V5azmXttc"
+    ],
+    "match": "native_withdraw event with matching receiver and amount",
+    "swap_observed": [
+     {
+      "receipt_id": "HoYsMbKdRmoaECmnJ9vaeaEEpvkQGvw6Z39V5azmXttc",
+      "sold": [
+       "nep141:gnosis-0x2a22f9c3b484c3629090feed35f17ff8f88f76f0.omft.near"
+      ],
+      "bought": [
+       "nep141:wrap.near"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "scenarios": {
+  "adverse": {
+   "assumptions": {
+    "volume_usd": 16380588605.0,
+    "take_rate_bps": 12.397727114519643,
+    "capture_share": 0.12897516242109858,
+    "allocation_to_buybacks": 0.5,
+    "net_new_supply_near": 39529256.943168044,
+    "near_price_usd": 2.0749916790136984
+   },
+   "buyback_accrual_usd": 1309627.1320312503,
+   "issuance_usd": 82022879.23466815,
+   "buyback_yield_on_mcap": 0.0002255254860400304,
+   "dilution_yield_on_mcap": 0.014124821678908106,
+   "net_yield_on_mcap": -0.013899296192868076
+  },
+  "base": {
+   "assumptions": {
+    "volume_usd": 32761177210.0,
+    "take_rate_bps": 16.530302819359523,
+    "capture_share": 0.17196688322813142,
+    "allocation_to_buybacks": 0.8099201934760618,
+    "net_new_supply_near": 31623405.554534435,
+    "near_price_usd": 2.0749916790136984
+   },
+   "buyback_accrual_usd": 7542709.049999999,
+   "issuance_usd": 65618303.387734525,
+   "buyback_yield_on_mcap": 0.0012988988109320836,
+   "dilution_yield_on_mcap": 0.011299857343126486,
+   "net_yield_on_mcap": -0.010000958532194402
+  },
+  "favorable": {
+   "assumptions": {
+    "volume_usd": 65522354420.0,
+    "take_rate_bps": 20.662878524199403,
+    "capture_share": 0.21495860403516426,
+    "allocation_to_buybacks": 1.0,
+    "net_new_supply_near": 23717554.165900826,
+    "near_price_usd": 2.0749916790136984
+   },
+   "buyback_accrual_usd": 29102825.156249993,
+   "issuance_usd": 49213727.54080089,
+   "buyback_yield_on_mcap": 0.005011677467556229,
+   "dilution_yield_on_mcap": 0.008474893007344863,
+   "net_yield_on_mcap": -0.0034632155397886348
+  }
+ },
+ "scenario_multipliers": {
+  "adverse": {
+   "volume": 0.5,
+   "take_rate": 0.75,
+   "capture": 0.75,
+   "allocation": 0.5,
+   "issuance": 1.25
+  },
+  "base": {
+   "volume": 1.0,
+   "take_rate": 1.0,
+   "capture": 1.0,
+   "allocation": null,
+   "issuance": 1.0
+  },
+  "favorable": {
+   "volume": 2.0,
+   "take_rate": 1.25,
+   "capture": 1.25,
+   "allocation": 1.0,
+   "issuance": 0.75
+  }
+ },
+ "dominant_assumption": {
+  "method": "one at a time: each input moved from its base to its adverse value, others held at base; ranked by the absolute change in net yield",
+  "ranking": [
+   {
+    "assumption": "issuance",
+    "net_yield_on_mcap": -0.012825922867976023,
+    "change_vs_base": -0.0028249643357816205
+   },
+   {
+    "assumption": "volume",
+    "net_yield_on_mcap": -0.010650407937660443,
+    "change_vs_base": -0.0006494494054660408
+   },
+   {
+    "assumption": "allocation",
+    "net_yield_on_mcap": -0.010497988948317489,
+    "change_vs_base": -0.0004970304161230864
+   },
+   {
+    "assumption": "take_rate",
+    "net_yield_on_mcap": -0.010325683234927422,
+    "change_vs_base": -0.00032472470273301954
+   },
+   {
+    "assumption": "capture",
+    "net_yield_on_mcap": -0.010325683234927422,
+    "change_vs_base": -0.00032472470273301954
+   }
+  ],
+  "dominant": "issuance"
+ },
+ "what_weakens_the_thesis": "issuance above buyback accrual in every scenario means settlement growth does not translate into net token accrual; a fall in volume or capture, or an allocation decision away from buybacks, removes the accrual entirely",
+ "status_legend": {
+  "observed": "read from a public source and reproducible from the committed snapshot",
+  "classified": "a rule applied by the data provider",
+  "inferred": "computed from observed items under a stated assumption",
+  "unavailable": "not obtainable without credentials or absent on-chain"
+ }
+}

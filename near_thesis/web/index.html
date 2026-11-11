@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="reader-version" content="/*READER_VERSION*/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEAR Value Shift</title>
+<meta name="description" content="From clicks to settlement: a reproducible, quality-adjusted investment thesis on NEAR. Every chart shows its source and query.">
+<style>/*STYLE*/</style>
+</head>
+<body>
+<div class="progress" id="progress" aria-hidden="true" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+<a class="skip" href="#main">Skip to content</a>
+<div class="layout">
+<aside class="side" id="side">
+  <div class="brand"><a href="#top">NEAR Value Shift</a><span class="brand-sub">Investment thesis · Hackathon 2026</span></div>
+  <nav class="toc" id="toc" aria-label="On this page"></nav>
+  <div class="controls">
+    <div class="group"><label>Range</label><span id="range"></span></div>
+    <div class="group"><label>Theme</label><span id="theme"></span></div>
+  </div>
+  <div class="side-links">
+    <a href="https://github.com/Alberto-Campos-de-la-Torre/near-settlement-thesis">Repository</a>
+    <a href="THESIS.html?v=/*READER_VERSION*/">THESIS.md</a>
+    <a href="walkthrough.html?v=/*READER_VERSION*/">Executed notebook</a>
+  </div>
+</aside>
+<main class="main" id="main">
+<header class="hero-head" id="top">
+  <p class="kicker">A reproducible investment thesis on NEAR</p>
+  <h1>From clicks<br>to settlement</h1>
+  <p class="lede">Is activity shifting from many low-value transactions to fewer, high-value cross-chain settlements through NEAR Intents, and does that show up in anything but the price? Every number on this page is computed by <code>make build</code> from committed snapshots, and every chart lists its source and query.</p>
+  <div class="status-strip" id="strip"><span class="chip dates" id="dates"></span></div>
+</header>
+<section class="verdict" id="verdict" aria-labelledby="verdict-h"></section>
+<section class="argument" id="argument" aria-labelledby="argument-h"></section>
+<div class="hero" id="hero"></div>
+<div class="kpis" id="kpis"></div>
+<div id="charts"></div>
+<section class="against" id="against" aria-labelledby="against-h"></section>
+<section class="sensitivity" id="sensitivity" aria-labelledby="sensitivity-h"></section>
+<section class="repro" id="repro" aria-labelledby="repro-h">
+  <h2 id="repro-h">Reproduce it</h2>
+  <p class="sec-q">Start from the submitted repository, rebuild its evidence, then inspect the same results locally.</p>
+  <p class="repro-note">You need Git, GNU Make, Python 3.12 and <a href="https://docs.astral.sh/uv/">uv</a>. The first setup downloads dependencies. The build uses committed snapshots; no wallet, Google account or API keys are required. Jupyter needs permission to open localhost ports.</p>
+  <ol class="repro-steps">
+    <li><h3><span>01</span> Get the source</h3><pre><code>git clone https://github.com/Alberto-Campos-de-la-Torre/near-settlement-thesis.git
+cd near-settlement-thesis</code></pre><p>Use the repository and revision identified in the submission. Run the remaining commands from its root directory.</p></li>
+    <li><h3><span>02</span> Install the locked environment</h3><pre><code>uv sync --locked --all-extras --python 3.12</code></pre><p>Installs the analysis, notebook and testing dependencies. Keep <code>uv.lock</code> unchanged.</p></li>
+    <li><h3><span>03</span> Rebuild the evidence</h3><pre><code>make build</code></pre><p>Generates tables, models, charts, thesis, English review pages, the executed notebook and the local index. Existing committed research inputs are reused; this does not refresh data or send transactions.</p></li>
+    <li><h3><span>04</span> Run the regression suite</h3><pre><code>make test</code></pre><p>Expected: all tests pass, including pricing, receipt status, signing controls and English review-page navigation.</p></li>
+    <li><h3><span>05</span> Verify reproducibility</h3><pre><code>make check-generated</code></pre><p>Expected: generated artifacts match the checked-out commit, with exact text and hashes and only the declared numerical tolerance. A mismatch must be investigated, not silently overwritten.</p></li>
+    <li><h3><span>06</span> Open the demo</h3><pre><code>uv run python -m http.server 8000 --bind 127.0.0.1 --directory site</code></pre><p>Open <a href="http://127.0.0.1:8000/">http://127.0.0.1:8000/</a>. Check filters, themes, chart tables, sources, the local thesis and notebook. Keep the terminal running; press <kbd>Ctrl</kbd> + <kbd>C</kbd> to stop the server.</p></li>
+  </ol>
+  <p class="repro-note">The dashboard also opens directly from <code>site/index.html</code>. Keep the generated <code>site/</code> folder together so its thesis, methods and notebook links work. First-time installation needs internet; the reconstruction itself runs from the committed snapshots.</p>
+</section>
+<footer><div id="page-built">Dashboard generated (UTC): <time datetime="/*BUILD_TIME*/">/*BUILD_TIME*/</time>.</div><div id="built"></div><div>Built for the NEAR Hackathon 2026, track Investment Thesis. MIT licensed. Sources: NearBlocks, DefiLlama, FastNear block extracts, NEAR RPC, CoinGecko and GitHub. BigQuery is an optional extraction path.</div></footer>
+</main>
+</div>
+<button class="totop" id="totop" aria-label="Back to top" hidden>↑</button>
+<script id="spec" type="application/json">/*DATA*/</script>
+<script>/*APP*/</script>
+</body>
+</html>

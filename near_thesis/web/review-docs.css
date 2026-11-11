@@ -1,0 +1,59 @@
+:root { color-scheme: light dark; --page: #f9f9f7; --surface: #f2f1ed; --text: #0b0b0b; --link: #1c61af; --border: #c3c2b7; }
+@media (prefers-color-scheme: dark) { :root { --page: #0d0d0d; --surface: #232322; --text: #f0efec; --link: #68a9f5; --border: #52514e; } }
+* { box-sizing: border-box; }
+body { margin: 0 auto; max-width: 1120px; padding: 24px; background: var(--page); color: var(--text); font: 16px/1.65 system-ui, sans-serif; overflow-wrap: anywhere; }
+main { min-width: 0; }
+h1, h2, h3 { line-height: 1.25; font-family: Georgia, serif; scroll-margin-top: 16px; }
+h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); }
+h2 { margin-top: 2rem; }
+a { color: var(--link); text-underline-offset: 3px; }
+a:focus-visible { outline: 3px solid var(--link); outline-offset: 3px; }
+nav { margin-bottom: 32px; }
+code, pre { background: var(--surface); border-radius: 4px; font: .9em/1.6 ui-monospace, monospace; }
+code { padding: 2px 4px; }
+pre { padding: 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
+pre code { padding: 0; }
+table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+th, td { text-align: left; vertical-align: top; border: 1px solid var(--border); padding: 9px; }
+th { background: var(--surface); }
+blockquote { border-left: 3px solid var(--border); padding-left: 16px; margin-left: 0; }
+/* The same editorial palette and serif headings as the dashboard. */
+:root[data-theme="light"] { color-scheme: light; --page: #f9f9f7; --surface: #f2f1ed; --text: #0b0b0b; --link: #1c61af; --border: #c3c2b7; }
+:root[data-theme="dark"] { color-scheme: dark; --page: #0d0d0d; --surface: #232322; --text: #f0efec; --link: #68a9f5; --border: #52514e; }
+.reader-nav { position: sticky; top: 12px; z-index: 50; display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 14px 18px; margin-bottom: 36px; border: 1px solid var(--border); border-radius: 18px; background: var(--page); box-shadow: 0 8px 28px #00000012; }
+.reader-back { display: inline-flex; align-items: center; gap: 14px; color: var(--text); text-decoration: none; border-radius: 10px; }
+.reader-arrow { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 13px; color: var(--page); background: var(--link); font-size: 28px; transition: transform 160ms ease; }
+.reader-back:hover .reader-arrow { transform: translate(-2px, -2px); }
+.reader-back small { display: block; font-size: 9px; letter-spacing: .12em; color: var(--link); margin-bottom: 3px; }
+.reader-back strong { display: block; font-size: 16px; font-weight: 650; }
+.reader-tools { display: flex; align-items: center; gap: 16px; }
+.reader-label { color: var(--text); font-size: 12px; }
+.reader-theme { display: flex; gap: 3px; padding: 4px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.reader-theme button { font: 12px/1.4 system-ui, sans-serif; padding: 6px 9px; border: 0; border-radius: 7px; background: transparent; color: var(--text); cursor: pointer; }
+.reader-theme button[aria-pressed="true"] { color: var(--page); background: var(--link); }
+.reader-theme button:focus-visible { outline: 3px solid var(--link); outline-offset: 3px; }
+@media (max-width: 640px) { body { padding: 16px; } .reader-nav { position: relative; top: 0; flex-wrap: wrap; gap: 12px; padding: 14px; } .reader-tools { width: 100%; justify-content: space-between; } .reader-back strong { font-size: 15px; } }
+@media (prefers-reduced-motion: reduce) { .reader-arrow { transition: none; } }
+/* Jupyter output retains its data and plots, with product colors and local scrolling. */
+body.jp-Notebook { background: var(--page) !important; color: var(--text) !important; max-width: 1120px; padding: 24px !important; --jp-ui-font-color1: var(--text); --jp-content-font-color1: var(--text); --jp-layout-color0: var(--page); --jp-layout-color1: var(--surface); --jp-layout-color2: var(--surface); --jp-cell-editor-background: var(--surface); --jp-cell-editor-border-color: var(--border); --jp-border-color2: var(--border); }
+body.jp-Notebook main { min-width: 0; }
+.jp-Notebook .jp-Cell { min-width: 0; padding: 14px 0; }
+.jp-Notebook .jp-InputArea-editor { border: 1px solid var(--border) !important; border-radius: 10px; background: var(--surface) !important; }
+.jp-Notebook .highlight, .jp-Notebook .highlight pre { background: var(--surface) !important; color: var(--text) !important; }
+.jp-Notebook .highlight span, .jp-Notebook .jp-InputPrompt, .jp-Notebook .jp-OutputPrompt { color: var(--text) !important; opacity: 1 !important; }
+.jp-Notebook .jp-RenderedHTMLCommon { color: var(--text); }
+.jp-Notebook .jp-RenderedHTMLCommon table { color: var(--text); }
+.jp-Notebook .jp-RenderedHTMLCommon tr, .jp-Notebook .jp-RenderedHTMLCommon th, .jp-Notebook .jp-RenderedHTMLCommon td { background: var(--page); }
+.jp-Notebook .jp-OutputArea-child { display: flex; min-width: 0; }
+.jp-Notebook .jp-OutputArea-output { min-width: 0; flex: 1; overflow-x: auto; }
+.jp-Notebook .jp-OutputArea-output pre { white-space: pre-wrap; }
+.jp-Notebook .jp-RenderedImage img { max-width: 100%; height: auto; border-radius: 10px; background: #fff; }
+.jp-Notebook .jp-RenderedHTMLCommon h1 { font-family: Georgia, serif; font-size: clamp(1.8rem, 5vw, 2.6rem); }
+@media (max-width: 640px) { body.jp-Notebook { padding: 16px !important; } }
+.jp-Notebook table.dataframe { width: max-content; max-width: none; white-space: nowrap; overflow-wrap: normal; word-break: normal; }
+.jp-Notebook table.dataframe th, .jp-Notebook table.dataframe td { white-space: nowrap; overflow-wrap: normal; word-break: normal; }
+.jp-Notebook .jp-InputPrompt, .jp-Notebook .jp-OutputPrompt { min-width: 64px; width: 64px; flex: 0 0 64px; white-space: nowrap; }
+.jp-Notebook { --jp-content-link-color: var(--link); }
+.jp-Notebook [data-mime-type="application/vnd.jupyter.stderr"], .jp-Notebook [data-mime-type="application/vnd.jupyter.stderr"] pre { background: var(--surface) !important; color: var(--text) !important; }
+.jp-Notebook main { contain: layout paint; }
+.jp-Notebook .jp-OutputArea-output:focus-visible { outline: 3px solid var(--link); outline-offset: -3px; }

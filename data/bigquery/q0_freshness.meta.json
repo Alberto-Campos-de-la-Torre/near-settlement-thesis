@@ -1,0 +1,11 @@
+{
+ "sql": "q0_freshness.sql",
+ "run_at": "2026-11-08T08:39:22+00:00",
+ "bytes_processed": 0,
+ "bytes_billed": 0,
+ "accounted_bytes": 0,
+ "maximum_bytes_billed": 300000000000,
+ "rows": 1,
+ "job_id": "redacted-private-execution-id",
+ "publication_note": "Private execution/project identifiers removed; measurement values and query definitions retained."
+}
