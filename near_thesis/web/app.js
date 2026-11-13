@@ -81,8 +81,13 @@
 
   function rankedChart(spec, host) {
     const series = spec.series; const cats = series[0].points.map(p => p[0]);
-    const rowH = series.length > 1 ? 14 * series.length + 10 : 26; const top = 8, left = 150, right = 70;
+    const rowH = series.length > 1 ? 14 * series.length + 10 : 26; const top = 8, right = 70;
     const height = top + cats.length * rowH + 8; const svg = el('svg', { viewBox: `0 0 ${W} ${height}`, role: 'img', 'aria-label': spec.title }, host);
+    // Reserve the actual label width; fixed margins let long categories escape the card.
+    const measure = el('g', { class: 'cat', visibility: 'hidden' }, svg);
+    const labelWidths = cats.map(c => { const text = el('text', {}, measure); text.textContent = c; return text.getComputedTextLength(); });
+    const left = Math.max(150, ...labelWidths.map(width => Math.ceil(width) + 20));
+    measure.remove();
     const vals = series.flatMap(s => s.points.map(p => p[1]));
     let lo = Math.min(0, ...vals), hi = Math.max(0, ...vals); if (spec.y_domain) { lo = Math.min(lo, spec.y_domain[0] < 0 ? spec.y_domain[0] : 0); }
     hi = hi || 1; const pw = W - left - right; const xs = (v) => left + (v - lo) / (hi - lo) * pw;

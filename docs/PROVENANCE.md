@@ -2,7 +2,9 @@
 
 This repository continues the same Investment Thesis project, **From clicks to settlement**. It is not an independent second project or a claim that all work originated in this account.
 
-Source baseline: `5f6a14467a9b2394e395eecaf6b4bb1c9ed0eba6`, also published in [the upstream project](https://github.com/NGZeggers/near-value-shift). That project's development history begins on November 2, 2026. English presentation, reader navigation and subsequent quality corrections were prepared in a separate working copy before this public snapshot.
+Canonical submission repository: [Alberto-Campos-de-la-Torre/near-settlement-thesis](https://github.com/Alberto-Campos-de-la-Torre/near-settlement-thesis). Any older upstream README describing another repository as canonical is historical and does not override this delivery location.
+
+Source baseline: [`5f6a14467a9b2394e395eecaf6b4bb1c9ed0eba6`](https://github.com/NGZeggers/near-value-shift/commit/5f6a14467a9b2394e395eecaf6b4bb1c9ed0eba6), from [the upstream project](https://github.com/NGZeggers/near-value-shift). That project's development history begins on November 2, 2026. English presentation, reader navigation and subsequent quality corrections were prepared in a separate working copy before this public snapshot.
 
 This release uses one clean `main` branch rather than importing a multi-project repository or its historical production materials. Original MIT licensing and contributor attribution are retained in `LICENSE`; the upstream history records earlier contributors. The snapshot date is not the original research start date.
 

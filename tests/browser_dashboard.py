@@ -113,6 +113,17 @@ with sync_playwright() as p:
         page.set_viewport_size({'width': width, 'height': 900})
         page.goto(base)
         record(f'layout_{width}_no_overflow', page.evaluate('document.documentElement.scrollWidth <= innerWidth'), page.evaluate('({content:document.documentElement.scrollWidth,viewport:innerWidth})'))
+    # SVG overflow can escape a card without creating page-level horizontal scroll.
+    for width in [375, 768, 1440, 1920]:
+        page.set_viewport_size({'width': width, 'height': 1000})
+        page.goto(base)
+        overflow = page.locator('#chart-value_bridge .cat text').evaluate_all('''labels => labels.filter(label => {
+            const bounds = label.getBoundingClientRect();
+            const plot = label.closest('svg').getBoundingClientRect();
+            return bounds.left < plot.left - 1 || bounds.right > plot.right + 1;
+        }).map(label => label.textContent)''')
+        record(f'value_bridge_labels_inside_chart_{width}', not overflow, overflow)
+    page.set_viewport_size({'width': 375, 'height': 900})
     page.screenshot(path=str(OUT/'dashboard-mobile.png'), full_page=True)
     response = page.goto(base+'/walkthrough.html')
     record('executed_notebook_available', response.status == 200 and page.locator('.jp-Notebook').count() > 0)

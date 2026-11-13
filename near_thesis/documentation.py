@@ -5,6 +5,7 @@ import html
 import os
 from pathlib import Path
 import re
+import shutil
 from urllib.parse import unquote, urlsplit
 
 from .config import ROOT, SITE, REPO_URL
@@ -19,6 +20,11 @@ def run(destination: Path = SITE) -> None:
     sources = [ROOT/'README.md', ROOT/'THESIS.md', *sorted((ROOT/'docs').glob('*.md')),
                *sorted((ROOT/'audit').glob('**/README.md')), *sorted((ROOT/'data/bigquery').glob('**/README.md'))]
     outputs = {source.resolve(): destination/source.relative_to(ROOT).with_suffix('.html') for source in sources}
+    # Bundle the public dashboard capture for offline README rendering.
+    for asset in (ROOT/'docs'/'assets').glob('*.png'):
+        target = destination/'docs'/'assets'/asset.name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(asset, target)
     reader_head = reader.head()
 
     for source, output in outputs.items():

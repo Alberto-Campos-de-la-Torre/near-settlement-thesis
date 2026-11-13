@@ -43,3 +43,6 @@ finish_export.py
 check_routes.py
 docs/DEMO*
 demo-video*/
+
+# Rebuilt deployment bundle
+.pages/
