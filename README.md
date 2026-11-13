@@ -14,7 +14,7 @@ Do falling account counts hide a shift toward cross-chain settlement? This proje
 
 - **Canonical submission repository:** [Alberto-Campos-de-la-Torre/near-settlement-thesis](https://github.com/Alberto-Campos-de-la-Torre/near-settlement-thesis). This is the same project continued from the upstream research, not a second submission.
 - **Hosted dashboard:** [Open the live dashboard](https://alberto-campos-de-la-torre.github.io/near-settlement-thesis/). GitHub Pages deploys only after the build and validation jobs succeed; the local build below remains reproducible.
-- **Public X demo post/video:** pending publication by the team. No demo-post URL has been supplied or verified. Video and production files are intentionally kept outside this repository.
+- **Public X demo post/video:** [Watch the demo on X](https://x.com/mrdvdmedina/status/2121061701374345406). Video and production files are intentionally kept outside this repository.
 - **Origin and development history:** [provenance and dated upstream baseline](docs/PROVENANCE.md). The November 10 snapshot commit is not the original research start date.
 
 ## Reproduce: do X, see Y
